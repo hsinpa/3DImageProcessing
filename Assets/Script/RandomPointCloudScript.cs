@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class PointCloudScript : MonoBehaviour
+public class RandomPointCloudScript : MonoBehaviour
 {
     [SerializeField]
     bool isUpdate;
