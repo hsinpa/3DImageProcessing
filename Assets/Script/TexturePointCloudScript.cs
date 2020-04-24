@@ -96,7 +96,7 @@ public class TexturePointCloudScript : MonoBehaviour
             //mesh = new Mesh();
 
             //mesh.SetVertices(positions);
-            //mesh.SetIndices(indicies, MeshTopology.Points, 0);
+            //mesh.SetIndices(indicies, MeshTopolWWogy.Points, 0);
             //mesh.SetColors(colors);
 
             //meshFilter.mesh = mesh;
