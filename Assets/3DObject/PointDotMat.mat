@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: PointCloudMat
-  m_Shader: {fileID: 4800000, guid: b052eb11814c5a046b6c17fea6f6f297, type: 3}
+  m_Name: PointDotMat
+  m_Shader: {fileID: 4800000, guid: 8d86746852f53034a950a83c7ba66a3b, type: 3}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
@@ -67,7 +67,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _PointSize: 0.0133
+    - _PointSize: 0.1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

@@ -1,28 +1,29 @@
 ﻿// Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel GetMesh
 
-
-struct VecPair
-{
-	float3 position;
-	float4 color;
-	int indice;
-	float3 normal;
-};
-
-
-// Create a RenderTexture with enableRandomWrite flag and set it
-// with cs.SetTexture
 Texture2D<float4> MainTex;
 Texture2D<float4> DepthTex;
 
+uniform int TexWidth;
+
 RWStructuredBuffer<float3> PositionBuffer;
-RWStructuredBuffer<float3> ColorBuffer;
+RWStructuredBuffer<float4> ColorBuffer;
 RWStructuredBuffer<int> IndicesBuffer;
-RWStructuredBuffer<float3> NomralBuffer;
+RWStructuredBuffer<float3> NormalBuffer;
 
-[numthreads(8,8,1)]
-void GetMesh (uint3 id : SV_DispatchThreadID)
+[numthreads(16,16,1)]
+void GetMesh (uint2 id : SV_DispatchThreadID)
 {
+    int index = (TexWidth * id.y) + id.x;
 
+    float offSet = TexWidth * 0.5;
+    float pixelScale = 0.01;
+
+    ColorBuffer[index] = float4(MainTex[id.xy].x, MainTex[id.xy].y, MainTex[id.xy].z, 1);
+
+    PositionBuffer[index] = float3(id.xy * pixelScale, (1-DepthTex[id.xy].x) * 2);
+    //1-DepthTex[id.xy].x);
+
+    IndicesBuffer[index] =index;
+    //NormalBuffer[index] = float3(0.0, 1.0, 0.0);
 }

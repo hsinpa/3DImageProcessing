@@ -5,13 +5,13 @@ Shader "Hsinpa/PointCloudShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _PointSize ("Point Size", Range(0.01, 0.1)) = 1
+        _PointSize ("Point Size", Range(0.001, 0.1)) = 1
     }
     SubShader
     {
         Tags { "RenderType"="Opaque" }
         LOD 100
-        //Cull off
+        Cull off
 
         Pass
         {
@@ -25,6 +25,7 @@ Shader "Hsinpa/PointCloudShader"
             struct appdata{
                 float4 vertex : POSITION;
                 float3 normal : NORMAL;
+                fixed4 color : COLOR;
                 float2 uv : TEXCOORD0;
             };
  
@@ -32,11 +33,13 @@ Shader "Hsinpa/PointCloudShader"
                 float4 vertex : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normal : NORMAL;
+                fixed4 color : COLOR;
             };
  
             struct g2f{
                 float4 worldPos : SV_POSITION;
                 float3 normal : NORMAL;
+                fixed4 color : COLOR;
                 //float2 uv : TEXCOORD0;
                 //fixed4 col : COLOR;
             };
@@ -51,7 +54,8 @@ Shader "Hsinpa/PointCloudShader"
                 v2g o;
                 o.vertex = (v.vertex);
                 o.uv = (v.uv);
-                o.normal = v.normal * -1;
+                o.normal = v.normal;
+                o.color = v.color;
                 return o;
             }
 
@@ -64,6 +68,7 @@ Shader "Hsinpa/PointCloudShader"
                 float3 nor = IN[0].normal;
 
                 o.normal = nor;
+                o.color = IN[0].color;
 
                 float3 basePos1 = IN[0].vertex.xyz;
                 float3 basePos2 = IN[0].vertex.xyz +  _PointSize * topAngle;
@@ -85,7 +90,7 @@ Shader "Hsinpa/PointCloudShader"
             fixed4 frag (g2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = fixed4(1,1,1,1);
+                fixed4 col = i.color;
 
                 return col;
             }
