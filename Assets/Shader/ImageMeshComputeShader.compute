@@ -34,7 +34,7 @@ void GetMesh (uint2 id : SV_DispatchThreadID)
 
     ColorBuffer[index] = float4(MainTex[id.xy].x, MainTex[id.xy].y, MainTex[id.xy].z, 1);
 
-    PositionBuffer[index] = float3(id.xy * pixelScale, (1-DepthTex[id.xy].x) * 2);
+    PositionBuffer[index] = float3(id.xy * pixelScale, (DepthTex[id.xy].x) * 2);
     //1-DepthTex[id.xy].x);
 
     IndicesBuffer[index] =index;

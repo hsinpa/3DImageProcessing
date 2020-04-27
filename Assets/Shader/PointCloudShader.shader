@@ -22,18 +22,13 @@ Shader "Hsinpa/PointCloudShader"
 
             #include "UnityCG.cginc"
 
-            struct appdata{
-                float4 vertex : POSITION;
-                float3 normal : NORMAL;
-                fixed4 color : COLOR;
-                float2 uv : TEXCOORD0;
-            };
  
             struct v2g{
                 float4 vertex : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normal : NORMAL;
                 fixed4 color : COLOR;
+                                uint id : NUMBER;
             };
  
             struct g2f{
@@ -49,13 +44,25 @@ Shader "Hsinpa/PointCloudShader"
 
             float _PointSize;
 
-            v2g vert (appdata v)
+            StructuredBuffer<float3> _PositionBuffer;
+            StructuredBuffer<float4> _ColorBuffer;
+            StructuredBuffer<int> _Triangle;
+
+            uniform float3 _ObjectPosition;
+            uniform int _Width;
+            uniform int _TotalVertex;
+
+
+            v2g vert (uint id : SV_VertexID)
             {
                 v2g o;
-                o.vertex = (v.vertex);
-                o.uv = (v.uv);
-                o.normal = v.normal;
-                o.color = v.color;
+
+                float3 objectPosition = _ObjectPosition + _PositionBuffer[id];
+
+                o.vertex = fixed4((objectPosition),0);
+                o.color = _ColorBuffer[id];
+                o.id = id;
+
                 return o;
             }
 
@@ -98,3 +105,4 @@ Shader "Hsinpa/PointCloudShader"
         }
     }
 }
+

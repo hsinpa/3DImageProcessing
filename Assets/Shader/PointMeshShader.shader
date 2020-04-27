@@ -6,6 +6,8 @@ Shader "Hsinpa/PointMeshShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _PointSize ("Point Size", Range(0.01, 0.1)) = 1
+        _Threshold ("Threshold", Range(0.00001, 1)) = 1
+
     }
     SubShader
     {
@@ -46,10 +48,15 @@ Shader "Hsinpa/PointMeshShader"
             float4 _MainTex_ST;
 
             float _PointSize;
+            float _Threshold;
 
             StructuredBuffer<float3> _PositionBuffer;
             StructuredBuffer<float4> _ColorBuffer;
             StructuredBuffer<int> _Triangle;
+
+            float CrossProductFourPoint(float3 point1, float3 point2, float3 point3, float3 point4) {
+                return length(cross(point1, point2) + cross(point2, point3) + cross(point3, point4) + cross(point4, point1)) / 2;
+            }
 
             v2g vert (uint id : SV_VertexID)
             {
@@ -74,13 +81,17 @@ Shader "Hsinpa/PointMeshShader"
                 float3 topAngle = float3(0, 1, 0);
                 float3 rightAngle = float3(1, 0, 0);
                 o.color = IN[0].color;
-
-                float3 basePos1 = IN[0].vertex.xyz;
+                
+               float3 basePos1 =  _ObjectPosition + _PositionBuffer[id];
                 float3 basePos2 = _ObjectPosition + _PositionBuffer[id+1];
-                float3 basePos3 = _ObjectPosition + _PositionBuffer[id + _Width];
-                float3 basePos4 = _ObjectPosition + _PositionBuffer[id + _Width +1];
+               float3 basePos3 = _ObjectPosition + _PositionBuffer[id + _Width+1];
+                float3 basePos4 = _ObjectPosition + _PositionBuffer[id + _Width +2];
+                
+                //if (_Threshold < CrossProductFourPoint(basePos1, basePos2, basePos3, basePos4)) return;
 
-                //o.worldPos = UnityObjectToClipPos(basePos1 - rightAngle * _PointSize * 0.5);
+                if (_Threshold < length(basePos1 - basePos2) || _Threshold < length(basePos2 - basePos3) ||
+                    _Threshold < length(basePos3 - basePos4) || _Threshold < length(basePos4 - basePos1)) return;
+
                 o.worldPos = UnityObjectToClipPos(basePos1);
                 triStream.Append(o);
 
@@ -89,8 +100,8 @@ Shader "Hsinpa/PointMeshShader"
 
                 o.worldPos = UnityObjectToClipPos(basePos3);
                 triStream.Append(o);
-
-                o.worldPos = UnityObjectToClipPos(basePos4);
+                
+               o.worldPos = UnityObjectToClipPos(basePos4);
                 triStream.Append(o);
 
                 triStream.RestartStrip();
