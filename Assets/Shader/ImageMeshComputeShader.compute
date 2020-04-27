@@ -9,7 +9,20 @@ uniform int TexWidth;
 RWStructuredBuffer<float3> PositionBuffer;
 RWStructuredBuffer<float4> ColorBuffer;
 RWStructuredBuffer<int> IndicesBuffer;
+RWStructuredBuffer<int> TriangleBuffer;
 RWStructuredBuffer<float3> NormalBuffer;
+
+
+void SetTriangle(int index, int x, int y) {
+    if (y == TexWidth-1 || x == TexWidth-1) return;
+
+    int ti = index * 6;
+
+    TriangleBuffer[ti] = index;
+    TriangleBuffer[ti + 3] = TriangleBuffer[ti + 2] = index + 1;
+    TriangleBuffer[ti + 4] = TriangleBuffer[ti + 1] = index + TexWidth + 1;
+    TriangleBuffer[ti + 5] = index + TexWidth + 2;
+}
 
 [numthreads(16,16,1)]
 void GetMesh (uint2 id : SV_DispatchThreadID)
@@ -25,5 +38,7 @@ void GetMesh (uint2 id : SV_DispatchThreadID)
     //1-DepthTex[id.xy].x);
 
     IndicesBuffer[index] =index;
+
+    //SetTriangle(index, id.x, id.y);
     //NormalBuffer[index] = float3(0.0, 1.0, 0.0);
 }
