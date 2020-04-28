@@ -84,8 +84,8 @@ Shader "Hsinpa/PointMeshShader"
                 
                float3 basePos1 =  _ObjectPosition + _PositionBuffer[id];
                 float3 basePos2 = _ObjectPosition + _PositionBuffer[id+1];
-               float3 basePos3 = _ObjectPosition + _PositionBuffer[id + _Width+1];
-                float3 basePos4 = _ObjectPosition + _PositionBuffer[id + _Width +2];
+               float3 basePos3 = _ObjectPosition + _PositionBuffer[id + _Width];
+                float3 basePos4 = _ObjectPosition + _PositionBuffer[id + _Width +1];
                 
                 //if (_Threshold < CrossProductFourPoint(basePos1, basePos2, basePos3, basePos4)) return;
 

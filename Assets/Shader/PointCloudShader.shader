@@ -88,8 +88,6 @@ Shader "Hsinpa/PointCloudShader"
                 o.normal = nor;
                 o.color = IN[0].color;
 
-
-
                 //Front
                 float3 basePos = _ObjectPosition + _PositionBuffer[id];
                 float3 basePosTop = basePos + _PointSize * topDir;
@@ -122,7 +120,19 @@ Shader "Hsinpa/PointCloudShader"
                 }
 
                 //Top Side
+                if (_Threshold < length(_PositionBuffer[id] - _PositionBuffer[topId])) {
+                    o.worldPos = UnityObjectToClipPos(basePosTop - rightDir * _PointSize * 0.5);
+                    triStream.Append(o);
 
+                    o.worldPos = UnityObjectToClipPos(basePosTop + rightDir * _PointSize * 0.5);
+                    triStream.Append(o);
+
+                    o.worldPos = UnityObjectToClipPos(basePosTop - rightDir * 0.5 * _PointSize - (frontDir * _PointSize));
+                    triStream.Append(o);
+
+                    o.worldPos = UnityObjectToClipPos(basePosTop + rightDir * 0.5 * _PointSize - (frontDir * _PointSize));
+                    triStream.Append(o);
+                }
 
 
 
