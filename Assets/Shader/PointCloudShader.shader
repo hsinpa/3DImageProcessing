@@ -6,6 +6,7 @@ Shader "Hsinpa/PointCloudShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _PointSize ("Point Size", Range(0.001, 0.1)) = 1
+        _Threshold("Threshold", Range(0.0001, 0.1)) = 1
     }
     SubShader
     {
@@ -28,7 +29,7 @@ Shader "Hsinpa/PointCloudShader"
                 float2 uv : TEXCOORD0;
                 float3 normal : NORMAL;
                 fixed4 color : COLOR;
-                                uint id : NUMBER;
+                uint id : NUMBER;
             };
  
             struct g2f{
@@ -43,6 +44,7 @@ Shader "Hsinpa/PointCloudShader"
             float4 _MainTex_ST;
 
             float _PointSize;
+            float _Threshold;
 
             StructuredBuffer<float3> _PositionBuffer;
             StructuredBuffer<float4> _ColorBuffer;
@@ -66,30 +68,63 @@ Shader "Hsinpa/PointCloudShader"
                 return o;
             }
 
-            [maxvertexcount(4)]
+            [maxvertexcount(12)]
             void geom(point v2g IN[1], inout TriangleStream<g2f> triStream) {
+                int id = IN[0].id;
+                if (id + _Width > _TotalVertex && id <= 0) return;
+
                 g2f o;
 
-                float3 topAngle = float3(0, 1, 0);
-                float3 rightAngle = float3(1, 0, 0);
+                int rightId = id - 1;
+                int leftId = id + 1;
+                int topId = id + _Width + 1;
+
+                float3 topDir = float3(0, 1, 0);
+                float3 rightDir = float3(1, 0, 0);
+                float3 frontDir = float3(0, 0, 1);
+
                 float3 nor = IN[0].normal;
 
                 o.normal = nor;
                 o.color = IN[0].color;
 
-                float3 basePos1 = IN[0].vertex.xyz;
-                float3 basePos2 = IN[0].vertex.xyz +  _PointSize * topAngle;
-                o.worldPos = UnityObjectToClipPos(basePos1 - rightAngle * _PointSize * 0.5);
+
+
+                //Front
+                float3 basePos = _ObjectPosition + _PositionBuffer[id];
+                float3 basePosTop = basePos + _PointSize * topDir;
+
+                o.worldPos = UnityObjectToClipPos(basePos - rightDir * _PointSize * 0.5);
                 triStream.Append(o);          
                
-                o.worldPos = UnityObjectToClipPos(basePos1 + rightAngle * _PointSize * 0.5);
+                o.worldPos = UnityObjectToClipPos(basePos + rightDir * _PointSize * 0.5);
                 triStream.Append(o);    
 
-                o.worldPos = UnityObjectToClipPos(basePos2 - rightAngle * _PointSize * 0.5);
+                o.worldPos = UnityObjectToClipPos(basePosTop - rightDir * _PointSize * 0.5);
                 triStream.Append(o);
 
-                o.worldPos = UnityObjectToClipPos(basePos2 + rightAngle * _PointSize * 0.5);
-                triStream.Append(o);    
+                o.worldPos = UnityObjectToClipPos(basePosTop + rightDir * _PointSize * 0.5);
+                triStream.Append(o);
+
+                //Left Side
+                if (_Threshold < length(_PositionBuffer[id] - _PositionBuffer[rightId])) {
+                    o.worldPos = UnityObjectToClipPos(basePos - rightDir * 0.5 * _PointSize - (frontDir * _PointSize));
+                    triStream.Append(o);
+
+                    o.worldPos = UnityObjectToClipPos(basePosTop - rightDir * 0.5 * _PointSize - (frontDir * _PointSize));
+                    triStream.Append(o);
+
+                    o.worldPos = UnityObjectToClipPos(basePos - rightDir * 0.5 * _PointSize);
+                    triStream.Append(o);
+
+                    o.worldPos = UnityObjectToClipPos(basePosTop - rightDir * 0.5 * _PointSize);
+                    triStream.Append(o);
+                }
+
+                //Top Side
+
+
+
 
                 triStream.RestartStrip();
             }
