@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DepthImgPrc;
 
 [ExecuteInEditMode]
 public class GPUInstanceMeshScript : MonoBehaviour
@@ -67,7 +68,7 @@ public class GPUInstanceMeshScript : MonoBehaviour
         mesh.UploadMeshData(true);
     }
 
-    private RenderTexture CreateRTexture(int width, int height, Texture rawTexture) {
+    public static RenderTexture CreateRTexture(int width, int height, Texture rawTexture) {
         RenderTexture mainRenderTexture = new RenderTexture(width, height, 8);
         mainRenderTexture.enableRandomWrite = true;
         mainRenderTexture.Create();
@@ -117,8 +118,8 @@ public class GPUInstanceMeshScript : MonoBehaviour
             _indicesBuffer = SetComputeBuffer(_indicesBuffer, indicies, floatSize, ComputeBufferType.Default);
 
 
-            mainRenderTexture = CreateRTexture(textureSize, textureSize, mainTexture);
-            depthRenderTexture = CreateRTexture(textureSize, textureSize, depthTexture);
+            mainRenderTexture = DepthImgPrcUtility.CreateRTexture(textureSize, textureSize, mainTexture);
+            depthRenderTexture = DepthImgPrcUtility.CreateRTexture(textureSize, textureSize, depthTexture);
 
             computeShader.SetTexture(kernelHandle, "MainTex", mainRenderTexture);
             computeShader.SetTexture(kernelHandle, "DepthTex", depthRenderTexture);
