@@ -81,6 +81,14 @@ class LoaderUtility:
         newImgs.append(cv2.flip(raw_image, -1))
         return newImgs
 
+    def FlipImages(self, imageList:[]):
+        newImgs = []
+
+        for raw_image in imageList:
+            newImgs.extend(self.FlipImage(raw_image))
+
+        return newImgs
+
     def Normalized(self, image):
         return image / 255
 
