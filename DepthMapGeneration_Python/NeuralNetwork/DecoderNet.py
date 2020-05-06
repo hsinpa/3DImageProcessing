@@ -9,22 +9,32 @@ class DecoderNet:
         x = Conv2DTranspose(320, (5, 5), strides=(1, 1), padding='same', use_bias=False)(input)
         x = BatchNormalization()(x)
         x = LeakyReLU()(x)
+        x = Conv2DTranspose(320, (3, 3), strides=(1, 1), padding='same', use_bias=False)(x)
+        x = BatchNormalization()(x)
 
-        x = Conv2DTranspose(160, (5, 5), strides=(2,2), padding='same', use_bias=False)(x)
+        x = Conv2DTranspose(240, (5, 5), strides=(2,2), padding='same', use_bias=False)(x)
         x = BatchNormalization()(x)
         x = LeakyReLU()(x)
+        x = Conv2DTranspose(240, (3, 3), strides=(1, 1), padding='same', use_bias=False)(x)
+        x = BatchNormalization()(x)
 
-        x = Conv2DTranspose(96, (5, 5), strides=(2,2), padding='same', use_bias=False)(x)
+        x = Conv2DTranspose(120, (5, 5), strides=(2,2), padding='same', use_bias=False)(x)
         x = BatchNormalization()(x)
         x = LeakyReLU()(x)
+        x = Conv2DTranspose(120, (3, 3), strides=(1, 1), padding='same', use_bias=False)(x)
+        x = BatchNormalization()(x)
 
-        x = Conv2DTranspose(64, (5, 5), strides=(2, 2), padding='same', use_bias=False)(x)
+        x = Conv2DTranspose(60, (5, 5), strides=(2,2), padding='same', use_bias=False)(x)
         x = BatchNormalization()(x)
         x = LeakyReLU()(x)
+        x = Conv2DTranspose(60, (3, 3), strides=(1, 1), padding='same', use_bias=False)(x)
+        x = BatchNormalization()(x)
 
-        x = Conv2DTranspose(32, (5, 5), strides=(2, 2), padding='same', use_bias=False)(x)
+        x = Conv2DTranspose(32, (5, 5), strides=(2,2), padding='same', use_bias=False)(x)
         x = BatchNormalization()(x)
         x = LeakyReLU()(x)
+        x = Conv2DTranspose(32, (3, 3), strides=(1, 1), padding='same', use_bias=False)(x)
+        x = BatchNormalization()(x)
 
         x = Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='sigmoid')(x)
 
@@ -33,7 +43,7 @@ class DecoderNet:
         return x
 
 def CheckModelStructure():
-    inputs = Input(shape=(8, 8, 320))
+    inputs = Input(shape=(4, 4, 320))
 
     decoder = DecoderNet()
     model = Model(inputs, decoder.Build(inputs))

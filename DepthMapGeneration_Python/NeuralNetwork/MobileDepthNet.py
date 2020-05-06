@@ -3,6 +3,8 @@ import tensorflow as tf
 import tensorflow.keras.backend as K
 import NeuralNetwork.MobileNetV3
 from NeuralNetwork.DecoderNet import DecoderNet
+from NeuralNetwork.SRGANDecoder import SRGANDecoder
+
 from tensorflow.keras.layers import  Concatenate, Add
 from NeuralNetwork.MobileNetV3 import MobileNetv3
 from tensorflow.keras.models import Model
@@ -40,12 +42,15 @@ class MobileDepthNet:
 
 
     def Build(self):
-        inputsStructure = (256, 256, 3)
+        inputsStructure = (128, 128, 3)
         mobilenetOutputStructure = (16, 16, 320)
 
         mobileNet, mobileInput = MobileNetv3(inputsStructure, 100)
 
-        decoder = DecoderNet()
+        # decoder = DecoderNet()
+        # decoder = decoder.Build(mobileNet)
+
+        decoder = SRGANDecoder()
         decoder = decoder.Build(mobileNet)
 
         model = Model(mobileInput, decoder)
@@ -54,28 +59,29 @@ class MobileDepthNet:
         #
         # model = Model(decoder, decoderInput)
 
-        model.compile(optimizer='adam',
-                      loss= tf.keras.losses.MeanSquaredError(),
+        adam = tf.keras.optimizers.Adam()
+
+        model.compile(optimizer=adam,
+                      loss=tf.keras.losses.MeanAbsoluteError(),
                       metrics=[tf.keras.metrics.Accuracy()])
 
-        #print(model.summary())
+        print(model.summary())
 
         return model
 
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-EPOCHS = 100
-BATCHSIZE = 16
+EPOCHS = 30
+BATCHSIZE = 32
 xPath = '../Dataset/ResizeImage/Raw/'
 yPath = '../Dataset/ResizeImage/Depth/'
 
 dataPreparator = DataPreparator(xPath, cv2.COLOR_BGR2RGB, yPath, cv2.IMREAD_GRAYSCALE)
-trainXSet, trainYSet, testXSet, testYSet = dataPreparator.GetTrainTestSet(ratio=0.05)
-
+trainXSet, trainYSet, testXSet, testYSet = dataPreparator.GetTrainTestSet(ratio=0.05, useAugmentation=True)
 
 #print(trainXSet.shape)
-trainYSet = trainYSet.reshape(len(trainXSet), 256, 256, 1)
-testYSet = testYSet.reshape(len(testYSet), 256, 256, 1)
+trainYSet = trainYSet.reshape(len(trainXSet), 128, 128, 1)
+testYSet = testYSet.reshape(len(testYSet), 128, 128, 1)
 
 mobileDepthNet = MobileDepthNet()
 model = mobileDepthNet.Build()
@@ -87,20 +93,21 @@ checkpoint_dir = os.path.dirname(checkpoint_path)
 cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_weights_only=True,
                                                  verbose=1)
-# if os.path.exists(checkpoint_path + '.index'):
-#     model.load_weights(checkpoint_path)
+if os.path.exists(checkpoint_path + '.index'):
+    model.load_weights(checkpoint_path)
 
 # model_history = model.fit(x = trainXSet, y= trainYSet, epochs=EPOCHS,batch_size=BATCHSIZE,
 #                           shuffle=True, callbacks=[cp_callback],
 #                           validation_data=(testXSet, testYSet))
 
-predictSet = trainXSet[5].reshape(1, 256, 256, 3)
+predictSet = trainXSet[33].reshape(1, 128, 128, 3)
 result = model.predict(predictSet)
 
-input = trainXSet[5].reshape(256, 256, 3)
-result = result.reshape(256, 256, 1)
-groundTruth = trainYSet[5].reshape(256,256,1)
+input = trainXSet[33].reshape(128, 128, 3)
+result = result.reshape(128, 128, 1)
+groundTruth = trainYSet[33].reshape(128,128,1)
 
+print(result)
 cv2.imshow('image',result)
 cv2.imshow('input',input)
 cv2.imshow('groundTruth', groundTruth)

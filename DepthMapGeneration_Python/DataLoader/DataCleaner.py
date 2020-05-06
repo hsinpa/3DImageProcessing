@@ -45,5 +45,5 @@ for path in allFolders:
     for i in range(len(colorPath)):
         colorNewFileName = loader.ChangeImageFileType(colorPath[i], "jpeg")
         depthNewFileName = loader.ChangeImageFileType(depthPath[i], "jpeg")
-        loader.resize_canvas(colorPath[i], resizeFolder +"/Raw/" + colorNewFileName, img_type="jpeg", canvas_width=256, canvas_height=256)
-        loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthNewFileName, img_type="jpeg", canvas_width=256, canvas_height=256)
+        loader.resize_canvas(colorPath[i], resizeFolder +"/Raw/" + colorNewFileName, img_type="jpeg", canvas_width=128, canvas_height=128)
+        loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthNewFileName, img_type="jpeg", canvas_width=128, canvas_height=128)

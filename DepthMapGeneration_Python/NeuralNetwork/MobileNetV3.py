@@ -160,7 +160,7 @@ def MobileNetv3(input_shape, k, alpha=1.0):
     #return model
 
 def CheckModelStructure():
-    input_shape = (256, 256, 3)
+    input_shape = (128, 128, 3)
 
     output, inputs = MobileNetv3(input_shape, 100, 1.0)
     model = Model(inputs, output)
