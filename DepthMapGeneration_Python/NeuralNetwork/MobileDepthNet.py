@@ -13,6 +13,8 @@ import cv2
 import matplotlib.pyplot as plt
 import os
 from DataLoader.LoaderUtility import  LoaderUtility
+from NeuralNetwork.LossFunction import depth_loss_function
+
 class MobileDepthNet:
 
 
@@ -63,7 +65,7 @@ class MobileDepthNet:
         adam = tf.keras.optimizers.Adam()
 
         model.compile(optimizer=adam,
-                      loss=tf.keras.losses.MeanAbsoluteError(),
+                      loss=depth_loss_function,
                       metrics=[tf.keras.metrics.Accuracy()])
 
         print(model.summary())
