@@ -19,8 +19,10 @@ class DataPreparator():
             xSet.extend( self.dataLoader.FlipImages(xSet))
             ySet.extend( self.dataLoader.FlipImages(ySet))
 
-        return np.array(xSet[:-trainLength]) / 255.0, np.array(ySet[:-trainLength]) / 255.0, \
-               np.array(xSet[-trainLength:]) / 255.0, np.array(ySet[-trainLength:]) / 255.0
+        # return np.array(xSet[:-trainLength]) / 255.0, np.array(ySet[:-trainLength]) / 255.0, \
+        #        np.array(xSet[-trainLength:]) / 255.0, np.array(ySet[-trainLength:]) / 255.0
+        return np.array(self.dataLoader.TanhData(xSet[:-trainLength], 255.0)), np.array(self.dataLoader.TanhData(ySet[:-trainLength], 255.0)),\
+               np.array(self.dataLoader.TanhData(xSet[-trainLength:], 255.0)), np.array(self.dataLoader.TanhData(xSet[-trainLength:], 255.0))
 
     def GetXYDataSet(self):
 

@@ -12,7 +12,7 @@ from DataLoader.DataPreparator import DataPreparator
 import cv2
 import matplotlib.pyplot as plt
 import os
-
+from DataLoader.LoaderUtility import  LoaderUtility
 class MobileDepthNet:
 
     def dice_loss(self, y_true, y_pred):
@@ -71,6 +71,7 @@ class MobileDepthNet:
 
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
+dataLoader = LoaderUtility()
 EPOCHS = 30
 BATCHSIZE = 32
 xPath = '../Dataset/ResizeImage/Raw/'
@@ -100,12 +101,12 @@ if os.path.exists(checkpoint_path + '.index'):
 #                           shuffle=True, callbacks=[cp_callback],
 #                           validation_data=(testXSet, testYSet))
 
-predictSet = trainXSet[33].reshape(1, 128, 128, 3)
+predictSet = trainXSet[0].reshape(1, 128, 128, 3)
 result = model.predict(predictSet)
 
-input = trainXSet[33].reshape(128, 128, 3)
-result = result.reshape(128, 128, 1)
-groundTruth = trainYSet[33].reshape(128,128,1)
+input = trainXSet[0].reshape(128, 128, 3)
+result = dataLoader.DeTanhData(result.reshape(128, 128, 1))
+groundTruth = trainYSet[0].reshape(128,128,1)
 
 print(result)
 cv2.imshow('image',result)

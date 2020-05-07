@@ -36,7 +36,7 @@ class DecoderNet:
         x = Conv2DTranspose(32, (3, 3), strides=(1, 1), padding='same', use_bias=False)(x)
         x = BatchNormalization()(x)
 
-        x = Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='sigmoid')(x)
+        x = Conv2DTranspose(1, (5, 5), strides=(2, 2), padding='same', use_bias=False, activation='tanh')(x)
 
         #model = Model(inputs, x)
 

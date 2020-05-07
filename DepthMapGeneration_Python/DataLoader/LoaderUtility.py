@@ -89,6 +89,15 @@ class LoaderUtility:
 
         return newImgs
 
+    def TanhData(self, dataSet, normalizedNum = 1):
+        #Assume dataset is between number 0 to 1
+        dataSet = dataSet / normalizedNum
+        return (dataSet * 2) - 1
+
+    def DeTanhData(self, dataSet):
+        #Assume dataset is between number 0 to 1
+        return (dataSet + 1) * 0.5
+
     def Normalized(self, image):
         return image / 255
 
