@@ -15,6 +15,7 @@ import os
 from DataLoader.LoaderUtility import  LoaderUtility
 class MobileDepthNet:
 
+
     def dice_loss(self, y_true, y_pred):
         numerator = 2 * tf.reduce_sum(y_true * y_pred, axis=-1)
         denominator = tf.reduce_sum(y_true + y_pred, axis=-1)
@@ -42,7 +43,7 @@ class MobileDepthNet:
 
 
     def Build(self):
-        inputsStructure = (128, 128, 3)
+        inputsStructure = (128, 128, 1)
         mobilenetOutputStructure = (16, 16, 320)
 
         mobileNet, mobileInput = MobileNetv3(inputsStructure, 100)
@@ -72,16 +73,16 @@ class MobileDepthNet:
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 dataLoader = LoaderUtility()
-EPOCHS = 30
-BATCHSIZE = 32
+EPOCHS = 20
+BATCHSIZE = 16
 xPath = '../Dataset/ResizeImage/Raw/'
 yPath = '../Dataset/ResizeImage/Depth/'
 
 dataPreparator = DataPreparator(xPath, cv2.COLOR_BGR2RGB, yPath, cv2.IMREAD_GRAYSCALE)
-trainXSet, trainYSet, testXSet, testYSet = dataPreparator.GetTrainTestSet(ratio=0.05, useAugmentation=True)
+trainXSet, trainYSet, testXSet, testYSet = dataPreparator.GetTrainTestSet(ratio=0.05, useAugmentation=False)
 
-#print(trainXSet.shape)
-trainYSet = trainYSet.reshape(len(trainXSet), 128, 128, 1)
+# print(trainXSet.shape)
+trainYSet = trainYSet.reshape(len(trainYSet), 128, 128, 1)
 testYSet = testYSet.reshape(len(testYSet), 128, 128, 1)
 
 mobileDepthNet = MobileDepthNet()
@@ -101,17 +102,20 @@ if os.path.exists(checkpoint_path + '.index'):
 #                           shuffle=True, callbacks=[cp_callback],
 #                           validation_data=(testXSet, testYSet))
 
-predictSet = trainXSet[0].reshape(1, 128, 128, 3)
-result = model.predict(predictSet)
+# predictSet = trainXSet[0].reshape(1, 128, 128, 3)
+# result = model.predict(predictSet)
 
-input = trainXSet[0].reshape(128, 128, 3)
-result = dataLoader.DeTanhData(result.reshape(128, 128, 1))
-groundTruth = trainYSet[0].reshape(128,128,1)
-
-print(result)
-cv2.imshow('image',result)
-cv2.imshow('input',input)
-cv2.imshow('groundTruth', groundTruth)
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# input = trainXSet[0].reshape(128, 128, 3)
+# result = result.reshape(128, 128, 1)
+# groundTruth = trainYSet[0].reshape(128,128,1)
+#
+# print(result)
+# print(groundTruth)
+#
+# cv2.imshow('image',result)
+# cv2.imshow('input',input)
+# cv2.imshow('groundTruth', groundTruth)
+#
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+#

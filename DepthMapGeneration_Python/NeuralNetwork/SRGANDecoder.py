@@ -38,7 +38,7 @@ class SRGANDecoder:
         gen_model = model
 
         # Using 16 Residual Blocks
-        for index in range(16):
+        for index in range(2):
             model = self.res_block_gen(model, 3, 64, 1)
 
         model = Conv2D(filters=64, kernel_size=3, strides=1, padding="same")(model)
@@ -49,7 +49,7 @@ class SRGANDecoder:
         for index in range(5):
             model = self.up_sampling_block(model, 3, 256, 1)
 
-        model = Conv2D(filters=1, kernel_size=9, strides=1, padding="same", activation='sigmoid' )(model)
+        model = Conv2D(filters=1, kernel_size=9, strides=1, padding="same", activation='tanh' )(model)
 
         return model
 
