@@ -4,7 +4,7 @@ import tensorflow.keras.backend as K
 import NeuralNetwork.MobileNetV3
 from NeuralNetwork.DecoderNet import DecoderNet
 from NeuralNetwork.SRGANDecoder import SRGANDecoder
-
+from NeuralNetwork.PretrainedModel import PretrainedModel
 from tensorflow.keras.layers import  Concatenate, Add
 from NeuralNetwork.MobileNetV3 import MobileNetv3
 from tensorflow.keras.models import Model
@@ -45,7 +45,7 @@ class MobileDepthNet:
 
 
     def Build(self):
-        inputsStructure = (128, 128, 1)
+        inputsStructure = (128, 128, 3)
         mobilenetOutputStructure = (16, 16, 320)
 
         mobileNet, mobileInput = MobileNetv3(inputsStructure, 100)
@@ -66,7 +66,7 @@ class MobileDepthNet:
 
         model.compile(optimizer=adam,
                       loss=depth_loss_function,
-                      metrics=[tf.keras.metrics.Accuracy()])
+                      metrics=[tf.keras.metrics.MeanSquaredLogarithmicError(),tf.keras.metrics.MeanSquaredError()])
 
         print(model.summary())
 
@@ -75,7 +75,7 @@ class MobileDepthNet:
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 dataLoader = LoaderUtility()
-EPOCHS = 20
+EPOCHS = 100
 BATCHSIZE = 16
 xPath = '../Dataset/ResizeImage/Raw/'
 yPath = '../Dataset/ResizeImage/Depth/'
@@ -87,8 +87,9 @@ trainXSet, trainYSet, testXSet, testYSet = dataPreparator.GetTrainTestSet(ratio=
 trainYSet = trainYSet.reshape(len(trainYSet), 128, 128, 1)
 testYSet = testYSet.reshape(len(testYSet), 128, 128, 1)
 
-mobileDepthNet = MobileDepthNet()
-model = mobileDepthNet.Build()
+#mobileDepthNet = MobileDepthNet()
+mobileDepthNet = PretrainedModel()
+model = mobileDepthNet.Build((128,128,3))
 
 checkpoint_path = "../save_model/training_1/cp.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)
@@ -104,20 +105,19 @@ if os.path.exists(checkpoint_path + '.index'):
 #                           shuffle=True, callbacks=[cp_callback],
 #                           validation_data=(testXSet, testYSet))
 
-# predictSet = trainXSet[0].reshape(1, 128, 128, 3)
-# result = model.predict(predictSet)
+predictSet = trainXSet[0].reshape(1, 128, 128, 3)
+result = model.predict(predictSet)
 
-# input = trainXSet[0].reshape(128, 128, 3)
-# result = result.reshape(128, 128, 1)
-# groundTruth = trainYSet[0].reshape(128,128,1)
-#
-# print(result)
-# print(groundTruth)
-#
-# cv2.imshow('image',result)
-# cv2.imshow('input',input)
-# cv2.imshow('groundTruth', groundTruth)
-#
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
-#
+input = trainXSet[0].reshape(128, 128, 3)
+result = result.reshape(128, 128, 1)
+groundTruth = trainYSet[0].reshape(128,128,1)
+
+print(result)
+print(groundTruth)
+
+cv2.imshow('image',result)
+cv2.imshow('input',input)
+cv2.imshow('groundTruth', groundTruth)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()

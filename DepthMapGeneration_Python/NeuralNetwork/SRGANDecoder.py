@@ -49,7 +49,7 @@ class SRGANDecoder:
         for index in range(5):
             model = self.up_sampling_block(model, 3, 256, 1)
 
-        model = Conv2D(filters=1, kernel_size=9, strides=1, padding="same", activation='tanh' )(model)
+        model = Conv2D(filters=1, kernel_size=9, strides=1, padding="same" )(model)
 
         return model
 
