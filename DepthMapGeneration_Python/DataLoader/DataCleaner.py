@@ -25,7 +25,7 @@ def GetImageFromPath(p_path: str, p_valid_formats: List[str]):
 
     return path
 
-resizeFolder = "../Dataset/ResizeImage"
+resizeFolder = "../Dataset/ResizeImage/Train"
 testPath_1 = '../Dataset/indoor_test/test/LR/'
 
 loader = LoaderUtility()

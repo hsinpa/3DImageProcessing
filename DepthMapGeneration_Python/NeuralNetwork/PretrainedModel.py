@@ -30,9 +30,7 @@ class PretrainedModel:
 
         model.compile(optimizer=adam,
                       loss=depth_loss_function,
-                      metrics=[tf.keras.metrics.Accuracy()])
-
-        print(model.summary())
+                      metrics=[tf.keras.metrics.MeanSquaredLogarithmicError(), tf.keras.metrics.MeanSquaredError()])
 
         return model
 

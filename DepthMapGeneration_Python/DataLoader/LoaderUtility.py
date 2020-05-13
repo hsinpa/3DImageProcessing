@@ -34,6 +34,9 @@ class LoaderUtility:
 
         return sets
 
+    def GetFileNameFromPath(self, p_path: str):
+        return os.listdir(p_path)
+
     def GetLabelIndexFromImages(self, image_name: str, labels):
         label_s_index = image_name.rfind("_") + 1
 
@@ -77,8 +80,8 @@ class LoaderUtility:
         newImgs = []
 
         newImgs.append(cv2.flip(raw_image, 1))
-        newImgs.append(cv2.flip(raw_image, 0))
-        newImgs.append(cv2.flip(raw_image, -1))
+        # newImgs.append(cv2.flip(raw_image, 0))
+        # newImgs.append(cv2.flip(raw_image, -1))
         return newImgs
 
     def FlipImages(self, imageList:[]):

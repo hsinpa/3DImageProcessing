@@ -2,35 +2,36 @@ import numpy as np
 import cv2
 from tensorflow.keras.utils import Sequence
 
-
-class DataGenerator(Sequence):
+class ImageDataLoader(Sequence):
     """Generates data for Keras
     Sequence based data generator. Suitable for building data generator for training and prediction.
     """
-    def __init__(self, list_IDs, labels, image_path, mask_path,
+    def __init__(self, list_IDs, image_path, label_path,
                  to_fit=True, batch_size=32, dim=(256, 256),
-                 n_channels=1, n_classes=10, shuffle=True):
+                 input_channels=1, output_channels=1, input_image_type=0, output_image_type=0, shuffle=True):
         """Initialization
         :param list_IDs: list of all 'label' ids to use in the generator
-        :param labels: list of image labels (file names)
         :param image_path: path to images location
-        :param mask_path: path to masks location
+        :param label_path: path to masks location
         :param to_fit: True to return X and y, False to return X only
         :param batch_size: batch size at each iteration
         :param dim: tuple indicating image dimension
-        :param n_channels: number of image channels
-        :param n_classes: number of output masks
+        :param input_channels: number of image channels
+        :param output_channels: number of output masks
+        :param input_image_type: OpenCV Image Type
+        :param output_image_type: OpenCV Image Type
         :param shuffle: True to shuffle label indexes after every epoch
         """
         self.list_IDs = list_IDs
-        self.labels = labels
         self.image_path = image_path
-        self.mask_path = mask_path
+        self.label_path = label_path
         self.to_fit = to_fit
         self.batch_size = batch_size
         self.dim = dim
-        self.n_channels = n_channels
-        self.n_classes = n_classes
+        self.input_channels = input_channels
+        self.output_channels = output_channels
+        self.input_image_type = input_image_type
+        self.output_image_type = output_image_type
         self.shuffle = shuffle
         self.on_epoch_end()
 
@@ -73,13 +74,12 @@ class DataGenerator(Sequence):
         :return: batch of images
         """
         # Initialization
-        X = np.empty((self.batch_size, *self.dim, self.n_channels))
+        X = np.empty((self.batch_size, *self.dim, self.input_channels))
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            X[i,] = self._load_grayscale_image(self.image_path + self.labels[ID])
-
+            X[i,] = self._load_image(self.image_path + ID, self.input_image_type)
         return X
 
     def _generate_y(self, list_IDs_temp):
@@ -87,21 +87,24 @@ class DataGenerator(Sequence):
         :param list_IDs_temp: list of label ids to load
         :return: batch if masks
         """
-        y = np.empty((self.batch_size, *self.dim), dtype=int)
+        y = np.empty((self.batch_size, *self.dim, self.output_channels), dtype=float)
 
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            y[i,] = self._load_grayscale_image(self.mask_path + self.labels[ID])
+            filename = ID.replace('_c', '_depth_vi')
+            img = self._load_image(self.label_path + filename, self.output_image_type)
+            img = img.reshape(*self.dim, self.output_channels)
+
+            y[i,] = img
 
         return y
 
-    def _load_grayscale_image(self, image_path):
+    def _load_image(self, image_path, image_type):
         """Load grayscale image
         :param image_path: path to image to load
         :return: loaded image
         """
-        img = cv2.imread(image_path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = img / 255
+        img = cv2.imread(image_path, image_type)
+        img = img / 255.0
         return img
