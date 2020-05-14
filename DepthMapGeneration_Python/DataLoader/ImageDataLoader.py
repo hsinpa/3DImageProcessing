@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 from tensorflow.keras.utils import Sequence
+import random
 
 class ImageDataLoader(Sequence):
     """Generates data for Keras
@@ -8,7 +9,7 @@ class ImageDataLoader(Sequence):
     """
     def __init__(self, list_IDs, image_path, label_path,
                  to_fit=True, batch_size=32, dim=(256, 256),
-                 input_channels=1, output_channels=1, input_image_type=0, output_image_type=0, shuffle=True):
+                 input_channels=1, output_channels=1, input_image_type=0, output_image_type=0, shuffle=True, augmentation=None, initSeed=1):
         """Initialization
         :param list_IDs: list of all 'label' ids to use in the generator
         :param image_path: path to images location
@@ -33,6 +34,9 @@ class ImageDataLoader(Sequence):
         self.input_image_type = input_image_type
         self.output_image_type = output_image_type
         self.shuffle = shuffle
+        self.augmentation = augmentation
+        self.seed = initSeed
+        self.epochNum = 0
         self.on_epoch_end()
 
     def __len__(self):
@@ -41,11 +45,13 @@ class ImageDataLoader(Sequence):
         """
         return int(np.floor(len(self.list_IDs) / self.batch_size))
 
-    def __getitem__(self, index):
+    def __getitem__(self, index:int):
         """Generate one batch of data
         :param index: index of the batch
         :return: X and y when fitting. X only when predicting
         """
+        self.seed += int(index) * self.epochNum
+
         # Generate indexes of the batch
         indexes = self.indexes[index * self.batch_size:(index + 1) * self.batch_size]
 
@@ -56,14 +62,31 @@ class ImageDataLoader(Sequence):
         X = self._generate_X(list_IDs_temp)
 
         if self.to_fit:
-            y = self._generate_y(list_IDs_temp)
-            return X, y
+            Y = self._generate_y(list_IDs_temp)
+
+            if self.augmentation is not None:
+
+                random.seed(self.seed)
+                xStack = np.stack([
+                    self.augmentation(image=x)["image"] for x in X
+                ], axis=0)
+
+                random.seed(self.seed)
+                yStack = np.stack([
+                    self.augmentation(image=y)["image"] for y in Y
+                ], axis=0)
+
+                return xStack, yStack
+
+            return X, Y
         else:
             return X
 
     def on_epoch_end(self):
         """Updates indexes after each epoch
         """
+        self.epochNum += 1
+
         self.indexes = np.arange(len(self.list_IDs))
         if self.shuffle == True:
             np.random.shuffle(self.indexes)

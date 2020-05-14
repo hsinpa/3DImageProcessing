@@ -7,24 +7,27 @@ from NeuralNetwork.LossFunction import depth_loss_function
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 from NeuralNetwork.NetworkUtility import getLayerIndexByName
 from NeuralNetwork.SRGANDecoder import SRGANDecoder
+from NeuralNetwork.MobileNetV3 import MobileNetv3
 
 class PretrainedModel:
     def Build(self, image_shape):
         outputShape = (image_shape[0], image_shape[1], 1)
 
-        pretrainMobileNet = MobileNetV2(input_shape=image_shape, weights='imagenet', include_top=False, alpha=1.0)
+        mobilenetv3, mobileInput = MobileNetv3(image_shape, 100)
 
-        targetIndex = getLayerIndexByName(pretrainMobileNet, 'block_4_expand')
-
-        for layerIndex in range(targetIndex):
-            pretrainMobileNet.layers[layerIndex].trainable = False
-
-        mobilenetOutput = pretrainMobileNet.layers[-3].output
+        # pretrainMobileNet = MobileNetV2(input_shape=image_shape, weights='imagenet', include_top=False, alpha=1.0)
+        #
+        # targetIndex = getLayerIndexByName(pretrainMobileNet, 'block_4_expand')
+        #
+        # for layerIndex in range(targetIndex):
+        #     pretrainMobileNet.layers[layerIndex].trainable = False
+        #
+        # mobilenetOutput = pretrainMobileNet.layers[-3].output
 
         decoder = SRGANDecoder()
-        decoder = decoder.Build(mobilenetOutput)
+        decoder = decoder.Build(mobilenetv3)
 
-        model = Model(pretrainMobileNet.input, decoder)
+        model = Model(mobileInput, decoder)
 
         adam = tf.keras.optimizers.Adam()
 

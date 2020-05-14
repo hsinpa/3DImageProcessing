@@ -15,9 +15,13 @@ import matplotlib.pyplot as plt
 import os
 from DataLoader.LoaderUtility import  LoaderUtility
 from NeuralNetwork.LossFunction import depth_loss_function
+import random
+import time
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
+from albumentations import (
+    Compose, HorizontalFlip, Blur, RandomGamma
+)
 dataLoader = LoaderUtility()
 EPOCHS = 100
 BATCHSIZE = 16
@@ -30,11 +34,29 @@ validYPath = '../Dataset/ResizeImage/Validation/Depth/'
 trainData = dataLoader.GetFileNameFromPath(trainXPath)
 validData = dataLoader.GetFileNameFromPath(validXPath)
 
+startSeed = (time.time())
+
+AUGMENTATIONS_TRAIN = Compose([
+    HorizontalFlip(p=0.5),
+    RandomGamma(gamma_limit=(80, 120), p=0.1),
+    RandomGamma(p=0.1)
+])
+
 trainDataLoader = ImageDataLoader(trainData, trainXPath, trainYPath, batch_size=BATCHSIZE, dim=(128, 128), input_channels=3,
-                                  output_channels=1, input_image_type=cv2.COLOR_BGR2RGB, output_image_type=cv2.IMREAD_GRAYSCALE)
+                                  output_channels=1, input_image_type=cv2.COLOR_BGR2RGB, output_image_type=cv2.IMREAD_GRAYSCALE,
+                                  augmentation=AUGMENTATIONS_TRAIN, initSeed=startSeed)
 
 validDataLoader = ImageDataLoader(validData, validXPath, validYPath, batch_size=1, dim=(128, 128), input_channels=3,
                                   output_channels=1, input_image_type=cv2.COLOR_BGR2RGB, output_image_type=cv2.IMREAD_GRAYSCALE)
+
+
+x , y = trainDataLoader.__getitem__(5)
+
+cv2.imshow('input',x[10])
+cv2.imshow('groundTruth', y[10])
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
 # dataPreparator = DataPreparator(xPath, cv2.COLOR_BGR2RGB, yPath, cv2.IMREAD_GRAYSCALE)
 # trainXSet, trainYSet, testXSet, testYSet = dataPreparator.GetTrainTestSet(ratio=0.05, useAugmentation=False)
@@ -44,20 +66,20 @@ validDataLoader = ImageDataLoader(validData, validXPath, validYPath, batch_size=
 # testYSet = testYSet.reshape(len(testYSet), 128, 128, 1)
 #
 # #mobileDepthNet = MobileDepthNet()
-mobileDepthNet = PretrainedModel()
-model = mobileDepthNet.Build((128,128,3))
+# mobileDepthNet = PretrainedModel()
+# model = mobileDepthNet.Build((128,128,3))
 #
-checkpoint_path = "../save_model/training_1/cp.ckpt"
-checkpoint_dir = os.path.dirname(checkpoint_path)
+# checkpoint_path = "../save_model/training_1/cp.ckpt"
+# checkpoint_dir = os.path.dirname(checkpoint_path)
 
 # Create a callback that saves the model's weights
-cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-                                                 save_weights_only=True,
-                                                 verbose=1)
+# cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+#                                                  save_weights_only=True,
+#                                                  verbose=1)
 # if os.path.exists(checkpoint_path + '.index'):
 #     model.load_weights(checkpoint_path)
 
-model_history = model.fit(x=trainDataLoader, epochs=EPOCHS, callbacks=[cp_callback], validation_data=validDataLoader)
+#model_history = model.fit(x=trainDataLoader, epochs=EPOCHS, callbacks=[cp_callback], validation_data=validDataLoader)
 
 # predictSet = trainXSet[0].reshape(1, 128, 128, 3)
 # result = model.predict(predictSet)
