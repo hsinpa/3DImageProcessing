@@ -129,15 +129,26 @@ def MobileNetv3(input_shape, k, alpha=1.0):
         MobileNetv2 model.
     """
     inputs = Input(shape=input_shape)
+    encode_layer = []
 
     first_filters = _make_divisible(32 * alpha, 8)
     x = _conv_block(inputs, first_filters, (3, 3), strides=(2, 2))
     x = _inverted_residual_block(x, 16, (3, 3), t=1, alpha=alpha, strides=1, n=1)
+
+    encode_layer.append(x)
     x = _inverted_residual_block(x, 24, (3, 3), t=6, alpha=alpha, strides=2, n=2)
+
+    encode_layer.append(x)
     x = _inverted_residual_block(x, 32, (3, 3), t=6, alpha=alpha, strides=2, n=3)
+
+    encode_layer.append(x)
     x = _inverted_residual_block(x, 64, (3, 3), t=6, alpha=alpha, strides=2, n=4)
+
     x = _inverted_residual_block(x, 96, (3, 3), t=6, alpha=alpha, strides=1, n=3)
+
+    encode_layer.append(x)
     x = _inverted_residual_block(x, 160, (3, 3), t=6, alpha=alpha, strides=2, n=3)
+
     x = _inverted_residual_block(x, 320, (3, 3), t=6, alpha=alpha, strides=1, n=1)
 
     # if alpha > 1.0:
@@ -154,7 +165,7 @@ def MobileNetv3(input_shape, k, alpha=1.0):
     # x = Activation('softmax', name='softmax')(x)
     #output = Reshape((k,))(x)
 
-    return x, inputs
+    return x, inputs, encode_layer
     #model = Model(inputs, x)
     # plot_model(model, to_file='images/MobileNetv2.png', show_shapes=True)
     #return model
@@ -162,7 +173,7 @@ def MobileNetv3(input_shape, k, alpha=1.0):
 def CheckModelStructure():
     input_shape = (128, 128, 3)
 
-    output, inputs = MobileNetv3(input_shape, 100, 1.0)
+    output, inputs, encode_layer = MobileNetv3(input_shape, 100, 1.0)
     model = Model(inputs, output)
 
     print(model.summary())

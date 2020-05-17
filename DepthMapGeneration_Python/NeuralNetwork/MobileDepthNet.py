@@ -39,24 +39,16 @@ startSeed = (time.time())
 AUGMENTATIONS_TRAIN = Compose([
     HorizontalFlip(p=0.5),
     RandomGamma(gamma_limit=(80, 120), p=0.1),
-    RandomGamma(p=0.1)
+    Blur(p=0.1)
 ])
 
-trainDataLoader = ImageDataLoader(trainData, trainXPath, trainYPath, batch_size=BATCHSIZE, dim=(128, 128), input_channels=3,
+targetSize = (128, 128)
+trainDataLoader = ImageDataLoader(trainData, trainXPath, trainYPath, batch_size=BATCHSIZE, dim=(targetSize[0], targetSize[1]), input_channels=3,
                                   output_channels=1, input_image_type=cv2.COLOR_BGR2RGB, output_image_type=cv2.IMREAD_GRAYSCALE,
                                   augmentation=AUGMENTATIONS_TRAIN, initSeed=startSeed)
 
-validDataLoader = ImageDataLoader(validData, validXPath, validYPath, batch_size=1, dim=(128, 128), input_channels=3,
+validDataLoader = ImageDataLoader(validData, validXPath, validYPath, batch_size=2, dim=(targetSize[0], targetSize[1]), input_channels=3,
                                   output_channels=1, input_image_type=cv2.COLOR_BGR2RGB, output_image_type=cv2.IMREAD_GRAYSCALE)
-
-
-x , y = trainDataLoader.__getitem__(5)
-
-cv2.imshow('input',x[10])
-cv2.imshow('groundTruth', y[10])
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
 
 # dataPreparator = DataPreparator(xPath, cv2.COLOR_BGR2RGB, yPath, cv2.IMREAD_GRAYSCALE)
 # trainXSet, trainYSet, testXSet, testYSet = dataPreparator.GetTrainTestSet(ratio=0.05, useAugmentation=False)
@@ -66,27 +58,32 @@ cv2.destroyAllWindows()
 # testYSet = testYSet.reshape(len(testYSet), 128, 128, 1)
 #
 # #mobileDepthNet = MobileDepthNet()
-# mobileDepthNet = PretrainedModel()
-# model = mobileDepthNet.Build((128,128,3))
+mobileDepthNet = PretrainedModel()
+model = mobileDepthNet.Build((targetSize[0], targetSize[1], 3))
 #
-# checkpoint_path = "../save_model/training_1/cp.ckpt"
-# checkpoint_dir = os.path.dirname(checkpoint_path)
+checkpoint_path = "../save_model/training_1/cp.ckpt"
+checkpoint_dir = os.path.dirname(checkpoint_path)
 
 # Create a callback that saves the model's weights
-# cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-#                                                  save_weights_only=True,
-#                                                  verbose=1)
-# if os.path.exists(checkpoint_path + '.index'):
-#     model.load_weights(checkpoint_path)
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+if os.path.exists(checkpoint_path + '.index'):
+    model.load_weights(checkpoint_path)
 
-#model_history = model.fit(x=trainDataLoader, epochs=EPOCHS, callbacks=[cp_callback], validation_data=validDataLoader)
+model.save("../save_model/", save_format="tf")
 
-# predictSet = trainXSet[0].reshape(1, 128, 128, 3)
+# model_history = model.fit(x=trainDataLoader, epochs=EPOCHS, callbacks=[cp_callback], validation_data=validDataLoader, workers=4)
+
+# testX, testY = validDataLoader.__getitem__(0)
+# # testX, testY = trainDataLoader.__getitem__(0)
+#
+# predictSet = testX[0].reshape(1, targetSize[0], targetSize[1], 3)
 # result = model.predict(predictSet)
 #
-# input = trainXSet[0].reshape(128, 128, 3)
-# result = result.reshape(128, 128, 1)
-# groundTruth = trainYSet[0].reshape(128,128,1)
+# input = testX[0].reshape(targetSize[0], targetSize[1], 3)
+# result = result.reshape(targetSize[0], targetSize[1], 1)
+# groundTruth = testY[0].reshape(targetSize[0], targetSize[1],1)
 #
 # print(result)
 # print(groundTruth)

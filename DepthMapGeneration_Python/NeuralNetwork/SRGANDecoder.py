@@ -31,14 +31,14 @@ class SRGANDecoder:
 
     def Build(self, input):
 
-        model = Conv2D(filters=64, kernel_size=9, strides=1, padding="same")(input)
+        model = Conv2D(filters=64, kernel_size=7, strides=1, padding="same")(input)
         model = PReLU(alpha_initializer='zeros', alpha_regularizer=None, alpha_constraint=None, shared_axes=[1, 2])(
             model)
 
         gen_model = model
 
         # Using 16 Residual Blocks
-        for index in range(2):
+        for index in range(12):
             model = self.res_block_gen(model, 3, 64, 1)
 
         model = Conv2D(filters=64, kernel_size=3, strides=1, padding="same")(model)
@@ -54,7 +54,7 @@ class SRGANDecoder:
         return model
 
 def CheckModelStructure():
-    inputs = Input(shape=(4, 4, 320))
+    inputs = Input(shape=(8, 8, 320))
 
     decoder = SRGANDecoder()
     model = Model(inputs, decoder.Build(inputs))

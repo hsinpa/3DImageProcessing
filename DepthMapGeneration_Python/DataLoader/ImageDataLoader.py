@@ -69,12 +69,12 @@ class ImageDataLoader(Sequence):
                 random.seed(self.seed)
                 xStack = np.stack([
                     self.augmentation(image=x)["image"] for x in X
-                ], axis=0)
+                ], axis=0).astype(np.float32)
 
                 random.seed(self.seed)
                 yStack = np.stack([
                     self.augmentation(image=y)["image"] for y in Y
-                ], axis=0)
+                ], axis=0).astype(np.float32)
 
                 return xStack, yStack
 

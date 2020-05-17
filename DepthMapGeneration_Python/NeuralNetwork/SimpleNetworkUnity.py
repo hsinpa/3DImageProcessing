@@ -1,6 +1,5 @@
 import tensorflow as tf
 import numpy as np
-import mlagents.trainers.tensorflow_to_barracuda as barracuda
 import tf2onnx.convert as onnx
 
 randomDataSet = np.random.rand(3, 12, 12)
@@ -32,3 +31,5 @@ network = SimpleNetworkUnity()
 network.SetUp()
 network.Test(randomDataSet, randomLabelSet)
 network.model.save("../save_model/", save_format="tf")
+
+onnx()

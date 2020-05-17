@@ -1,6 +1,5 @@
 from DataLoader.LoaderUtility import LoaderUtility
 import numpy as np
-
 class DataPreparator():
 
     def __init__(self, x_path:str, x_imageType:int, y_path:str, y_imageType:int):

@@ -8,12 +8,13 @@ from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 from NeuralNetwork.NetworkUtility import getLayerIndexByName
 from NeuralNetwork.SRGANDecoder import SRGANDecoder
 from NeuralNetwork.MobileNetV3 import MobileNetv3
+from NeuralNetwork.DenseNet import DenseNet
 
 class PretrainedModel:
     def Build(self, image_shape):
         outputShape = (image_shape[0], image_shape[1], 1)
 
-        mobilenetv3, mobileInput = MobileNetv3(image_shape, 100)
+        mobilenetv3, mobileInput, encode_layer = MobileNetv3(image_shape, 100)
 
         # pretrainMobileNet = MobileNetV2(input_shape=image_shape, weights='imagenet', include_top=False, alpha=1.0)
         #
@@ -24,8 +25,11 @@ class PretrainedModel:
         #
         # mobilenetOutput = pretrainMobileNet.layers[-3].output
 
-        decoder = SRGANDecoder()
-        decoder = decoder.Build(mobilenetv3)
+        # decoder = SRGANDecoder()
+        # decoder = decoder.Build(mobilenetv3)
+
+        decoder = DenseNet(default_filter=32)
+        decoder = decoder.Build(mobilenetv3, encode_layer)
 
         model = Model(mobileInput, decoder)
 
@@ -34,7 +38,7 @@ class PretrainedModel:
         model.compile(optimizer=adam,
                       loss=depth_loss_function,
                       metrics=[tf.keras.metrics.MeanSquaredLogarithmicError(), tf.keras.metrics.MeanSquaredError()])
-
+        print(model.summary())
         return model
 
 if __name__ == '__main__':
