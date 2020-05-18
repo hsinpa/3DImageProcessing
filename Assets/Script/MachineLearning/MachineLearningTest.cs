@@ -16,7 +16,18 @@ public class MachineLearningTest : MonoBehaviour
     {
         InitModel(stupidModel);
 
-        ExecuteModel(nnModel, emptyTexture);
+        foreach (var input in nnModel.inputs)
+        {
+            Debug.Log(input.name);
+        }
+
+        foreach (var output in nnModel.outputs)
+        {
+            Debug.Log(output);
+        }
+
+
+        //ExecuteModel(nnModel, emptyTexture);
     }
 
     private void InitModel(NNModel onnxModel) {
