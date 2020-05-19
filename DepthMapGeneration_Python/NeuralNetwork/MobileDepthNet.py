@@ -17,13 +17,14 @@ from DataLoader.LoaderUtility import  LoaderUtility
 from NeuralNetwork.LossFunction import depth_loss_function
 import random
 import time
+from tensorflow.python.framework import convert_to_constants
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 from albumentations import (
     Compose, HorizontalFlip, Blur, RandomGamma
 )
 dataLoader = LoaderUtility()
-EPOCHS = 100
+EPOCHS = 1
 BATCHSIZE = 16
 trainXPath = '../Dataset/ResizeImage/Train/Raw/'
 trainYPath = '../Dataset/ResizeImage/Train/Depth/'
@@ -59,7 +60,7 @@ validDataLoader = ImageDataLoader(validData, validXPath, validYPath, batch_size=
 #
 # #mobileDepthNet = MobileDepthNet()
 mobileDepthNet = PretrainedModel()
-model = mobileDepthNet.Build((targetSize[0], targetSize[1], 3))
+model = mobileDepthNet.Build((targetSize[0], targetSize[1], 3), data_format='channels_last')
 #
 checkpoint_path = "../save_model/training_1/cp.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)

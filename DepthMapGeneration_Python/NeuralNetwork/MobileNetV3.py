@@ -44,7 +44,6 @@ def _conv_block(inputs, filters, kernel, strides):
     """
 
     channel_axis = 1 if K.image_data_format() == 'channels_first' else -1
-
     x = Conv2D(filters, kernel, padding='same', strides=strides)(inputs)
     x = BatchNormalization(axis=channel_axis)(x)
     return Activation(relu6)(x)
@@ -117,7 +116,7 @@ def _inverted_residual_block(inputs, filters, kernel, t, alpha, strides, n):
     return x
 
 
-def MobileNetv3(input_shape, k, alpha=1.0):
+def MobileNetv3(input_shape, k, alpha=1.0, data_format='channels_last'):
     """MobileNetv2
     This function defines a MobileNetv2 architectures.
     # Arguments
@@ -128,6 +127,7 @@ def MobileNetv3(input_shape, k, alpha=1.0):
     # Returns
         MobileNetv2 model.
     """
+    tf.keras.backend.set_image_data_format(data_format)
     inputs = Input(shape=input_shape, name='input_1')
     encode_layer = []
 
@@ -171,10 +171,11 @@ def MobileNetv3(input_shape, k, alpha=1.0):
     #return model
 
 def CheckModelStructure():
-    input_shape = (128, 128, 3)
+    input_shape = (3, 128, 128)
 
-    output, inputs, encode_layer = MobileNetv3(input_shape, 100, 1.0)
+    output, inputs, encode_layer = MobileNetv3(input_shape, 100, 1.0, data_format='channels_first')
     model = Model(inputs, output)
+    model.save("../save_model/", save_format="tf")
 
     print(model.summary())
 

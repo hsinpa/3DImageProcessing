@@ -12,10 +12,8 @@ from NeuralNetwork.DenseNet import DenseNet
 from NeuralNetwork.ResidualNet import ResidualNet
 
 class PretrainedModel:
-    def Build(self, image_shape):
-        outputShape = (image_shape[0], image_shape[1], 1)
-
-        mobilenetv3, mobileInput, encode_layer = MobileNetv3(image_shape, 100)
+    def Build(self, image_shape, data_format='channels_last'):
+        mobilenetv3, mobileInput, encode_layer = MobileNetv3(image_shape, 100, data_format=data_format)
 
         # pretrainMobileNet = MobileNetV2(input_shape=image_shape, weights='imagenet', include_top=False, alpha=1.0)
         #
@@ -44,4 +42,4 @@ class PretrainedModel:
 
 if __name__ == '__main__':
     model = PretrainedModel()
-    model.Build((128, 128, 3))
+    model.Build((128, 128,3), data_format='channels_last')

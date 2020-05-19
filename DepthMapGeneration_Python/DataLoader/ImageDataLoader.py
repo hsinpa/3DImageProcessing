@@ -102,7 +102,10 @@ class ImageDataLoader(Sequence):
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            X[i,] = self._load_image(self.image_path + ID, self.input_image_type)
+            img = self._load_image(self.image_path + ID, self.input_image_type)
+            img = img.reshape(*self.dim, self.input_channels)
+
+            X[i,] = img
         return X
 
     def _generate_y(self, list_IDs_temp):

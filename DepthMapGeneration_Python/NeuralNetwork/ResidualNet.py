@@ -2,7 +2,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, AvgPool2D, MaxPool2D
 from tensorflow.keras.layers import Activation, BatchNormalization, concatenate, LeakyReLU
 from tensorflow.keras.layers import Add, BatchNormalization, UpSampling2D, DepthwiseConv2D, add
-
+import tensorflow as tf
 from tensorflow.keras import backend as K
 
 class ResidualNet:
@@ -108,6 +108,7 @@ class ResidualNet:
     def Build(self, x, encode_layer: []):
         # x = UpSampling2D(size=2,interpolation='bilinear')(x)
         # x = Conv2D(96, kernel_size=3, strides=1, padding='same')(x)
+
         alpha = 1
         denseSetup = [(4, 160, 96), (6, 64, 32), (12, 28,24), (6, 20, 16)]
         denseSetCount = len(denseSetup)
@@ -128,7 +129,9 @@ class ResidualNet:
         return x
 
 def CheckModelStructure():
-    inputs = Input(shape=(4, 4, 320))
+    tf.keras.backend.set_image_data_format('channels_first')
+
+    inputs = Input(shape=(320, 4, 4))
 
     denseNet = ResidualNet()
     output = denseNet.Build(inputs, None)
