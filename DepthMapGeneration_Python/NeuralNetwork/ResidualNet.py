@@ -129,9 +129,9 @@ class ResidualNet:
         return x
 
 def CheckModelStructure():
-    tf.keras.backend.set_image_data_format('channels_first')
+    tf.keras.backend.set_image_data_format('channels_last')
 
-    inputs = Input(shape=(320, 4, 4))
+    inputs = Input(shape=(4, 4, 320))
 
     denseNet = ResidualNet()
     output = denseNet.Build(inputs, None)

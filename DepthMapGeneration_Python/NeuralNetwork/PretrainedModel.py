@@ -29,17 +29,18 @@ class PretrainedModel:
 
         # decoder = DenseNet(default_filter=32)
         # decoder = decoder.Build(mobilenetv3, encode_layer)
-
         model = Model(mobileInput, decoder)
+        print(model.summary())
 
         adam = tf.keras.optimizers.Adam()
 
         model.compile(optimizer=adam,
-                      loss=depth_loss_function,
-                      metrics=[tf.keras.metrics.MeanSquaredLogarithmicError(), tf.keras.metrics.MeanSquaredError()])
-        print(model.summary())
+        loss=depth_loss_function,
+        metrics=[tf.keras.metrics.MeanSquaredLogarithmicError(), tf.keras.metrics.MeanSquaredError()])
         return model
 
 if __name__ == '__main__':
     model = PretrainedModel()
-    model.Build((128, 128,3), data_format='channels_last')
+    m = model.Build((128, 128, 3), data_format='channels_last')
+    m.save("../save_model/", save_format="tf")
+

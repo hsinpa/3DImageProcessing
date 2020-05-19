@@ -42,7 +42,7 @@ public class MachineLearningTest : MonoBehaviour
     }
 
     private void ExecuteModel(Model precomputeModel, RenderTexture inputTexture) {
-        IWorker worker = WorkerFactory.CreateWorker(WorkerFactory.Type.ComputePrecompiled, precomputeModel);
+        IWorker worker = WorkerFactory.CreateWorker(WorkerFactory.Type.ComputePrecompiled, precomputeModel, true);
         var textures = new[] { inputTexture }; // these textures will form a batch
         var tensor = new Tensor(textures, 3);
         print(tensor.shape);
