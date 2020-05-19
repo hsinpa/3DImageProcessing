@@ -24,12 +24,11 @@ class SimpleNetworkUnity:
         self.model.compile(optimizer='adam',
                       loss=loss_fn,
                       metrics=['accuracy'])
-
-        self.model.fit(train_x, train_y, epochs=5)
+        print(self.model.summary())
+        # self.model.fit(train_x, train_y, epochs=5)
 
 network = SimpleNetworkUnity()
 network.SetUp()
 network.Test(randomDataSet, randomLabelSet)
-network.model.save("../save_model/", save_format="tf")
+# network.model.save("../save_model/", save_format="tf")
 
-onnx()

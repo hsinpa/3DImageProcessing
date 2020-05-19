@@ -9,6 +9,7 @@ from NeuralNetwork.NetworkUtility import getLayerIndexByName
 from NeuralNetwork.SRGANDecoder import SRGANDecoder
 from NeuralNetwork.MobileNetV3 import MobileNetv3
 from NeuralNetwork.DenseNet import DenseNet
+from NeuralNetwork.ResidualNet import ResidualNet
 
 class PretrainedModel:
     def Build(self, image_shape):
@@ -25,11 +26,11 @@ class PretrainedModel:
         #
         # mobilenetOutput = pretrainMobileNet.layers[-3].output
 
-        # decoder = SRGANDecoder()
-        # decoder = decoder.Build(mobilenetv3)
-
-        decoder = DenseNet(default_filter=32)
+        decoder = ResidualNet()
         decoder = decoder.Build(mobilenetv3, encode_layer)
+
+        # decoder = DenseNet(default_filter=32)
+        # decoder = decoder.Build(mobilenetv3, encode_layer)
 
         model = Model(mobileInput, decoder)
 

@@ -7,7 +7,11 @@ public class MachineLearningTest : MonoBehaviour
 {
     public NNModel stupidModel;
 
-    public RenderTexture emptyTexture;
+    public RenderTexture targetTexture;
+
+    public RenderTexture inputTexture;
+
+    public Texture texture;
 
     private Model nnModel;
 
@@ -16,6 +20,8 @@ public class MachineLearningTest : MonoBehaviour
     {
         InitModel(stupidModel);
 
+        Debug.Log(nnModel.layers[0].weights.Length);
+        
         foreach (var input in nnModel.inputs)
         {
             Debug.Log(input.name);
@@ -26,30 +32,31 @@ public class MachineLearningTest : MonoBehaviour
             Debug.Log(output);
         }
 
-
-        //ExecuteModel(nnModel, emptyTexture);
+        ExecuteModel(nnModel, inputTexture);
     }
 
     private void InitModel(NNModel onnxModel) {
         nnModel = ModelLoader.Load(onnxModel);
-        emptyTexture = PrepareInput(12, 12 , 8);
+
+        PrepareInput(texture, inputTexture);
     }
 
     private void ExecuteModel(Model precomputeModel, RenderTexture inputTexture) {
         IWorker worker = WorkerFactory.CreateWorker(WorkerFactory.Type.ComputePrecompiled, precomputeModel);
-        var tensor = new Tensor(inputTexture, 1);
+        var textures = new[] { inputTexture }; // these textures will form a batch
+        var tensor = new Tensor(textures, 3);
+        print(tensor.shape);
 
         worker.Execute(tensor);
 
         var outputTensor = worker.PeekOutput();
-        Debug.Log(outputTensor[0]);
+        print(outputTensor.shape);
+        outputTensor.ToRenderTexture(targetTexture);
     }
 
-    private RenderTexture PrepareInput(int width, int height, int depth) {
-        RenderTexture renderTexture = new RenderTexture(width, height, depth);
-        renderTexture.enableRandomWrite = true;
-        renderTexture.Create();
+    private RenderTexture PrepareInput(Texture texture, RenderTexture targetRenderer) {
+        Graphics.Blit(texture, targetRenderer);
 
-        return renderTexture;
+        return targetRenderer;
     }
 }

@@ -68,16 +68,16 @@ checkpoint_dir = os.path.dirname(checkpoint_path)
 cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_weights_only=True,
                                                  verbose=1)
-if os.path.exists(checkpoint_path + '.index'):
-    model.load_weights(checkpoint_path)
+# if os.path.exists(checkpoint_path + '.index'):
+#     model.load_weights(checkpoint_path)
 
-model.save("../save_model/", save_format="tf")
+# model.save("../save_model/", save_format="tf")
 
 # model_history = model.fit(x=trainDataLoader, epochs=EPOCHS, callbacks=[cp_callback], validation_data=validDataLoader, workers=4)
 
 # testX, testY = validDataLoader.__getitem__(0)
-# # testX, testY = trainDataLoader.__getitem__(0)
-#
+# testX, testY = trainDataLoader.__getitem__(0)
+
 # predictSet = testX[0].reshape(1, targetSize[0], targetSize[1], 3)
 # result = model.predict(predictSet)
 #

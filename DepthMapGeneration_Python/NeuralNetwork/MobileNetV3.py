@@ -128,7 +128,7 @@ def MobileNetv3(input_shape, k, alpha=1.0):
     # Returns
         MobileNetv2 model.
     """
-    inputs = Input(shape=input_shape)
+    inputs = Input(shape=input_shape, name='input_1')
     encode_layer = []
 
     first_filters = _make_divisible(32 * alpha, 8)
