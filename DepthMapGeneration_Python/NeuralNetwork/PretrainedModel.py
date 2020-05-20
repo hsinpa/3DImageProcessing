@@ -42,5 +42,5 @@ class PretrainedModel:
 if __name__ == '__main__':
     model = PretrainedModel()
     m = model.Build((128, 128, 3), data_format='channels_last')
-    m.save("../save_model/", save_format="tf")
+    # m.save("../save_model/", save_format="tf")
 

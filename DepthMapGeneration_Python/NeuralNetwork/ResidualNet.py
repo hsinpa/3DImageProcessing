@@ -110,12 +110,12 @@ class ResidualNet:
         # x = Conv2D(96, kernel_size=3, strides=1, padding='same')(x)
 
         alpha = 1
-        denseSetup = [(4, 160, 96), (6, 64, 32), (12, 28,24), (6, 20, 16)]
+        denseSetup = [(4, 160, 96), (6, 64, 32), (12, 28, 24), (4, 18, 16)]
         denseSetCount = len(denseSetup)
         for i in range(denseSetCount):
             r, train_f, trans_f = denseSetup[i]
 
-            x = self._inverted_residual_block(x, filters=train_f, kernel=3, strides=1, n=r, alpha=alpha, t=6)
+            x = self._inverted_residual_block(x, filters=train_f, kernel=3, strides=1, n=r, alpha=alpha, t=3)
             x = self.transition_layer(x, trans_f, maintain_filter=True)
             if encode_layer is not None:
                 x = Add()([x, encode_layer[denseSetCount - i - 1]])
