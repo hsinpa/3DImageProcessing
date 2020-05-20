@@ -4,7 +4,11 @@
 Texture2D<float4> MainTex;
 Texture2D<float4> DepthTex;
 
+uniform float DepthPower;
 uniform int TexWidth;
+uniform int DepthTxtWidth;
+uniform int DepthMapRevertFlag;
+uniform float TargetEndDiff;
 
 RWStructuredBuffer<float3> PositionBuffer;
 RWStructuredBuffer<float4> ColorBuffer;
@@ -34,7 +38,10 @@ void GetMesh (uint2 id : SV_DispatchThreadID)
 
     ColorBuffer[index] = float4(MainTex[id.xy].x, MainTex[id.xy].y, MainTex[id.xy].z, 1);
 
-    PositionBuffer[index] = float3(id.xy * pixelScale, 1-(DepthTex[id.xy].x) * 2);
+    //int2 depthIndex = floor(id.xy * TargetEndDiff);
+    uint2 depthIndex = (uint2)(floor(id.xy *  TargetEndDiff));
+
+    PositionBuffer[index] = float3(id.xy * pixelScale, ( DepthMapRevertFlag * (DepthTex[depthIndex].x) * DepthPower));
     //1-DepthTex[id.xy].x);
 
     IndicesBuffer[index] =index;

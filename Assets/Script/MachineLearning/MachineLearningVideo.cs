@@ -17,12 +17,12 @@ public class MachineLearningVideo : MonoBehaviour
     private CustomFixedUpdate FU_instance;
 
     private IWorker worker;
-    private Task taskA;
+    private Tensor outputTensor;
 
     // Start is called before the first frame update
     void Start()
     {
-        FU_instance = new CustomFixedUpdate(0.08f, OnFixedUpdate);
+        FU_instance = new CustomFixedUpdate(0.1f, OnFixedUpdate);
         InitModel(stupidModel);
     }
 
@@ -48,13 +48,14 @@ public class MachineLearningVideo : MonoBehaviour
         var tensor = new Tensor(inputTexture, 3);
 
         worker.Execute(tensor);
+        outputTensor = worker.PeekOutput();
 
-        var outputTensor = worker.PeekOutput();
         outputTensor.ToRenderTexture(targetTexture);
 
         tensor.Dispose();
         outputTensor.Dispose();
     }
+
 
     private void OnApplicationQuit()
     {

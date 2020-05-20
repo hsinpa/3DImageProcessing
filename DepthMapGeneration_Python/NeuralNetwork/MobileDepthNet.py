@@ -24,7 +24,7 @@ from albumentations import (
     Compose, HorizontalFlip, Blur, RandomGamma
 )
 dataLoader = LoaderUtility()
-EPOCHS = 10
+EPOCHS = 200
 BATCHSIZE = 16
 trainXPath = '../Dataset/ResizeImage/Train/Raw/'
 trainYPath = '../Dataset/ResizeImage/Train/Depth/'
@@ -71,7 +71,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  verbose=1)
 if os.path.exists(checkpoint_path + '.index'):
     model.load_weights(checkpoint_path)
-
+#
 model.save("../save_model/", save_format="tf")
 
 # model_history = model.fit(x=trainDataLoader, epochs=EPOCHS, callbacks=[cp_callback], validation_data=validDataLoader, workers=4)
