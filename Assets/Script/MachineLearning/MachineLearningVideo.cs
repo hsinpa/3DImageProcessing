@@ -48,6 +48,7 @@ public class MachineLearningVideo : MonoBehaviour
         var tensor = new Tensor(inputTexture, 3);
 
         worker.Execute(tensor);
+        worker.ExecuteAsync();
         outputTensor = worker.PeekOutput();
 
         outputTensor.ToRenderTexture(targetTexture);
