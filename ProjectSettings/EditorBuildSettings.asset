@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MachineLearningVideo.unity
+    guid: c4070e22a768d3346b3d63f302f87268
   m_configObjects: {}

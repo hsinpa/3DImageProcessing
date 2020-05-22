@@ -21,7 +21,6 @@ public class MouseInputCtrl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         Vector3 normalizedVector = NormalizeMousePos(Input.mousePosition);
 
         if (mouseMaterial != null)

@@ -59,7 +59,7 @@ public class GPUInstanceMeshScript : MonoBehaviour
 
     private void Start()
     {
-
+        ResetData();
     }
 
     public static RenderTexture CreateRTexture(int width, int height, Texture rawTexture) {
@@ -80,6 +80,9 @@ public class GPUInstanceMeshScript : MonoBehaviour
 
     void InitData()
     {
+        mainRenderTexture = DepthImgPrcUtility.CreateRTexture(mainTxtSize, mainTxtSize, mainTexture);
+        depthRenderTexture = DepthImgPrcUtility.CreateRTexture(mainTxtSize, mainTxtSize, depthTexture);
+
         bounds = new Bounds(transform.position, Vector3.one * (range + 1));
 
         positions = new Vector3[bufferSize];
@@ -121,9 +124,6 @@ public class GPUInstanceMeshScript : MonoBehaviour
 
         computeShader.SetFloat("DepthPower", DepthPower);
         computeShader.SetInt("DepthMapRevertFlag", isDepthRevert ? -1 : 1);
-
-        mainRenderTexture = DepthImgPrcUtility.CreateRTexture(mainTxtSize, mainTxtSize, mainTexture);
-        depthRenderTexture = DepthImgPrcUtility.CreateRTexture(mainTxtSize, mainTxtSize, depthTexture);
 
         computeShader.SetTexture(kernelHandle, "MainTex", mainRenderTexture);
         computeShader.SetTexture(kernelHandle, "DepthTex", depthRenderTexture);
