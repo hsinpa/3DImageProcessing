@@ -35,13 +35,16 @@ void GetMesh (uint2 id : SV_DispatchThreadID)
 
     float offSet = TexWidth * 0.5;
     float pixelScale = 0.01;
+    float frontScale = 0.5;
 
     ColorBuffer[index] = float4(MainTex[id.xy].x, MainTex[id.xy].y, MainTex[id.xy].z, 1);
 
     //int2 depthIndex = floor(id.xy * TargetEndDiff);
     uint2 depthIndex = (uint2)(floor(id.xy *  TargetEndDiff));
 
-    PositionBuffer[index] = float3(id.xy * pixelScale, ( DepthMapRevertFlag * (DepthTex[depthIndex].x) * DepthPower));
+    float tanhValue = (DepthTex[depthIndex].x * 2) - 1;
+    PositionBuffer[index] = float3(id.xy * (pixelScale) * (1 + DepthTex[depthIndex].xy * frontScale),
+                                ( DepthMapRevertFlag * (tanhValue) * DepthPower));
     //1-DepthTex[id.xy].x);
 
     IndicesBuffer[index] =index;

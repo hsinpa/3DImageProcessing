@@ -24,6 +24,9 @@ public class GPUInstanceMeshScript : MonoBehaviour
     [SerializeField]
     private bool isDepthRevert;
 
+    [SerializeField]
+    private Camera cameraObj;
+
     private Vector3 objectPosition;
     public float range;
     private Bounds bounds;
@@ -45,8 +48,8 @@ public class GPUInstanceMeshScript : MonoBehaviour
 
     int kernelHandle;
 
-    private int depthTxtSize = 256;
-    private int mainTxtSize = 256;
+    private int depthTxtSize = 128;
+    private int mainTxtSize = 512;
     private float targetEndDiff;
 
     int bufferSize => mainTxtSize * mainTxtSize;
@@ -59,7 +62,9 @@ public class GPUInstanceMeshScript : MonoBehaviour
 
     private void Start()
     {
-        ResetData();
+        if (cameraObj == null)
+            cameraObj = Camera.main;
+        //ResetData();
     }
 
     public static RenderTexture CreateRTexture(int width, int height, Texture rawTexture) {
@@ -81,7 +86,7 @@ public class GPUInstanceMeshScript : MonoBehaviour
     void InitData()
     {
         mainRenderTexture = DepthImgPrcUtility.CreateRTexture(mainTxtSize, mainTxtSize, mainTexture);
-        depthRenderTexture = DepthImgPrcUtility.CreateRTexture(mainTxtSize, mainTxtSize, depthTexture);
+        depthRenderTexture = DepthImgPrcUtility.CreateRTexture(depthTxtSize, depthTxtSize, depthTexture);
 
         bounds = new Bounds(transform.position, Vector3.one * (range + 1));
 
@@ -122,6 +127,7 @@ public class GPUInstanceMeshScript : MonoBehaviour
             isUpdate = false;
         }
 
+        computeShader.SetVector("_WorldCameraPosition", cameraObj.transform.position);
         computeShader.SetFloat("DepthPower", DepthPower);
         computeShader.SetInt("DepthMapRevertFlag", isDepthRevert ? -1 : 1);
 

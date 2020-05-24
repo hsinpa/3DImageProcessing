@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 import math
 from typing import List
+import PIL.ImageOps as ImageOps
 
 class LoaderUtility:
 
@@ -23,6 +24,9 @@ class LoaderUtility:
 
         return path
 
+    def GetImageName(self, p_name, p_file_type):
+        return p_name + '.' + p_file_type
+
     def GetCVImageFromPath(self, p_path: str, colorType : int):
         sets = []
 
@@ -36,6 +40,9 @@ class LoaderUtility:
 
     def GetFileNameFromPath(self, p_path: str):
         return os.listdir(p_path)
+
+    def GetFileType(self, p_path: str):
+        return p_path.split(".")[-1]
 
     def GetLabelIndexFromImages(self, image_name: str, labels):
         label_s_index = image_name.rfind("_") + 1
@@ -108,7 +115,7 @@ class LoaderUtility:
         return (image - 127.5) / 127.5
 
     def resize_canvas(self, old_image_path : str ="314.jpg", new_image_path : str ="save.jpg", img_type : str = "JPEG",
-                      canvas_width : int =500, canvas_height : int =500):
+                      canvas_width : int =500, canvas_height : int =500, revert_pixel : bool = False):
         """
         Resize the canvas of old_image_path.
 
@@ -127,7 +134,7 @@ class LoaderUtility:
         mode = im.mode
         new_background = (255, 255, 255)
         if len(mode) == 1:  # L, 1
-            new_background = (255)
+            new_background = (0)
         if len(mode) == 3:  # RGB
             new_background = (255, 255, 255)
         if len(mode) == 4:  # RGBA, CMYK
@@ -149,6 +156,10 @@ class LoaderUtility:
         y1 = int(math.floor((canvas_height - old_height) / 2))
 
         newImage = Image.new("RGB", (canvas_width, canvas_height), new_background)
+
+        if (revert_pixel):
+            im = ImageOps.invert(im)
+
         newImage.paste(im, (x1, y1, x1 + old_width, y1 + old_height))
 
         newImage.save(new_image_path, img_type)

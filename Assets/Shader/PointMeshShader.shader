@@ -5,9 +5,8 @@ Shader "Hsinpa/PointMeshShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _PointSize ("Point Size", Range(0.01, 0.1)) = 1
-        _Threshold ("Threshold", Range(0.00001, 1)) = 1
-
+        _Parallax ("Parallax", Range(0, 0.3)) = 0
+        _Threshold ("Threshold", Range(0.00001, 2)) = 1
     }
     SubShader
     {
@@ -40,6 +39,7 @@ Shader "Hsinpa/PointMeshShader"
                 //fixed4 col : COLOR;
             };
 
+            uniform float3 _WorldCameraPosition;
             uniform float3 _ObjectPosition;
             uniform int _Width;
             uniform int _TotalVertex;
@@ -47,7 +47,7 @@ Shader "Hsinpa/PointMeshShader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
 
-            float _PointSize;
+            float _Parallax;
             float _Threshold;
 
             StructuredBuffer<float3> _PositionBuffer;
@@ -62,10 +62,12 @@ Shader "Hsinpa/PointMeshShader"
             {
                 v2g o;
 
-                float3 objectPosition = _ObjectPosition + _PositionBuffer[id];
+                float4 objectPosition = fixed4(_ObjectPosition + _PositionBuffer[id], 0);
+                //objectPosition.z = objectPosition.z + (viewDir.z * _Parallax)
 
-                o.vertex = fixed4((objectPosition),0);
+                o.vertex = objectPosition;
                 o.color = _ColorBuffer[id];
+                //o.color = objectPosition.x + (viewDir.x * _Parallax);
                 o.id = id;
 
                 return o;
@@ -81,7 +83,7 @@ Shader "Hsinpa/PointMeshShader"
                 float3 topAngle = float3(0, 1, 0);
                 float3 rightAngle = float3(1, 0, 0);
                 o.color = IN[0].color;
-                
+
                float3 basePos1 =  _ObjectPosition + _PositionBuffer[id];
                 float3 basePos2 = _ObjectPosition + _PositionBuffer[id+1];
                float3 basePos3 = _ObjectPosition + _PositionBuffer[id + _Width];

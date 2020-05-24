@@ -21,7 +21,7 @@ from tensorflow.python.framework import convert_to_constants
 
 # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 from albumentations import (
-    Compose, HorizontalFlip, Blur, RandomGamma
+    Compose, HorizontalFlip, Blur, RandomGamma,RandomBrightnessContrast
 )
 dataLoader = LoaderUtility()
 EPOCHS = 200
@@ -40,7 +40,8 @@ startSeed = (time.time())
 AUGMENTATIONS_TRAIN = Compose([
     HorizontalFlip(p=0.5),
     RandomGamma(gamma_limit=(80, 120), p=0.1),
-    Blur(p=0.1)
+    Blur(p=0.1),
+    RandomBrightnessContrast(p=0.2, brightness_by_max=False)
 ])
 
 targetSize = (128, 128)

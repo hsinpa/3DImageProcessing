@@ -118,7 +118,7 @@ class ImageDataLoader(Sequence):
         # Generate data
         for i, ID in enumerate(list_IDs_temp):
             # Store sample
-            filename = ID.replace('_c', '_depth_vi')
+            filename = ID.replace('_c.jpeg', '_depth_vi.jpeg')
             img = self._load_image(self.label_path + filename, self.output_image_type)
             img = img.reshape(*self.dim, self.output_channels)
 
@@ -132,5 +132,7 @@ class ImageDataLoader(Sequence):
         :return: loaded image
         """
         img = cv2.imread(image_path, image_type)
+
         img = img / 255.0
+
         return img
