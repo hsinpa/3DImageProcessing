@@ -52,9 +52,9 @@ for i in range(len(colorPath)):
     colorNewFileName = loader.ChangeImageFileType(colorPath[i], fileType)
     depthNewFileName = loader.ChangeImageFileType(depthPath[i], fileType)
 
-    imageName = 'vision_' + str(i) + '_'
+    imageName = 'human_' + str(i) + '_'
     colorName = loader.GetImageName(imageName + 'c', fileType)
     depthName = loader.GetImageName(imageName + 'depth_vi', fileType)
 
     loader.resize_canvas(colorPath[i], resizeFolder +"/Raw/" + colorName, img_type=fileType, canvas_width=128, canvas_height=128)
-    loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthName, img_type=fileType, canvas_width=128, canvas_height=128, revert_pixel=True)
+    loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthName, img_type=fileType, canvas_width=128, canvas_height=128)
