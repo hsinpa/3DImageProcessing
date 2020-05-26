@@ -21,22 +21,32 @@ def ChangeColorDepthToGray(p_path):
     pixelsNew = img.load()
     for x in range(img.size[0]):
         for y in range(img.size[1]):
+
+            Red = pixelMap[x, y][0]
+            Green = pixelMap[x, y][1]
+            Blue = pixelMap[x, y][2]
+
             nRed = pixelMap[x, y][0] / 255.0
             nGreen = pixelMap[x, y][1] / 255.0
             nBlue = pixelMap[x, y][2] / 255.0
 
-            LGE = (nGreen * 0.25)
-            HGE = (nGreen * 0.5)
+            GE = (nGreen * 0.5)
 
-            Gray = (1 - nBlue) + LGE
-            if (nRed > nBlue):
-                Gray = 1 - (nRed * HGE)
+            scale = 0.9
+            Gray = ((-1 * nBlue) + (1 * nRed)) * (1 - GE)
+            Gray = (Gray + 1) * 0.5 * scale
 
-            if ((nRed == 0 and nGreen == 0)):
-                Gray *= 0.9
+            if ((Red < 3 and Green < 3 and Blue > 127 ) or (Blue < 3 and Green < 3 and Red > 127)):
+                max = 255.0
 
+                if (nRed > nBlue):
+                    residual = (1 - (Red / max)) * 0.1
+                    Gray = scale + residual
+                else:
+                    residual = (1 - (Blue / max)) * 0.1
+                    Gray = (1-scale) - residual
 
-            Gray = 255 - int(loader.Clamp(Gray, smallest=0, largest=1) * 255)
+            Gray = 255 - int(Gray * 255)
             pixelsNew[x, y] = (Gray, Gray, Gray)
 
     im.close()
