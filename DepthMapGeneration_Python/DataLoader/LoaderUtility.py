@@ -114,6 +114,9 @@ class LoaderUtility:
     def TanhNormalized(self, image):
         return (image - 127.5) / 127.5
 
+    def Clamp(self, n, smallest, largest):
+        return max(smallest, min(n, largest))
+
     def resize_canvas(self, old_image_path : str ="314.jpg", new_image_path : str ="save.jpg", img_type : str = "JPEG",
                       canvas_width : int =500, canvas_height : int =500, revert_pixel : bool = False):
         """

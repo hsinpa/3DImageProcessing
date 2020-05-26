@@ -9,8 +9,9 @@ import math
 import PIL.ImageOps as ImageOps
 
 
-valid_images = [".jpg",".png", ".tif", '.tiff']
+valid_images = [".jpg",".png", ".tif", '.tiff', '.jpeg']
 labels = []
+loader = LoaderUtility()
 
 def ChangeColorDepthToGray(p_path):
     im = Image.open(p_path).convert("RGB")
@@ -18,9 +19,30 @@ def ChangeColorDepthToGray(p_path):
 
     img = Image.new(im.mode, im.size)
     pixelsNew = img.load()
-    for i in range(img.size[0]):
-        for j in range(img.size[1]):
-            pass
+    for x in range(img.size[0]):
+        for y in range(img.size[1]):
+            nRed = pixelMap[x, y][0] / 255.0
+            nGreen = pixelMap[x, y][1] / 255.0
+            nBlue = pixelMap[x, y][2] / 255.0
+
+            LGE = (nGreen * 0.25)
+            HGE = (nGreen * 0.5)
+
+            Gray = (1 - nBlue) + LGE
+            if (nRed > nBlue):
+                Gray = 1 - (nRed * HGE)
+
+            if ((nRed == 0 and nGreen == 0)):
+                Gray *= 0.9
+
+
+            Gray = 255 - int(loader.Clamp(Gray, smallest=0, largest=1) * 255)
+            pixelsNew[x, y] = (Gray, Gray, Gray)
+
+    im.close()
+    img.show()
+    img.save(p_path)
+    img.close()
 
 def GetImageFromPath(p_path: str, p_valid_formats: List[str]):
     path = []
@@ -41,9 +63,9 @@ rawPath = '../Dataset/StreetShot/raw/'
 colorPath = '../Dataset/StreetShot/color/'
 depthPath = '../Dataset/StreetShot/depth/'
 
-loader = LoaderUtility()
-
 rawPath = GetImageFromPath(rawPath, valid_images)
+allDepthImage = GetImageFromPath(depthPath, valid_images)
+
 # colorPath = GetImageFromPath(directPath + "/color/", valid_images)
 # depthPath = GetImageFromPath(directPath + "/depth_vi/", valid_images)
 
@@ -63,20 +85,25 @@ d_width = 512
 d_height = 256
 depthArea = (d_x, d_y, d_width, d_height)
 
-for i in range(len(rawPath)):
+for i in range(len(allDepthImage)):
+    ChangeColorDepthToGray(allDepthImage[i])
 
-    imageName = 'street_' + str(i) + '_'
-    colorFullPath = colorPath + loader.GetImageName(imageName + 'c', fileType)
-    depthFullPath = depthPath + loader.GetImageName(imageName + 'depth_vi', fileType)
 
-    loader.SplitDepthPairImage(image_path=rawPath[i], color_area=colorArea, depth_area=depthArea,
-                                output_color_path=colorFullPath, output_depth_path=depthFullPath, output_size=outputSize, img_type=fileType)
-    # colorNewFileName = loader.ChangeImageFileType(colorPath[i], fileType)
-    # depthNewFileName = loader.ChangeImageFileType(depthPath[i], fileType)
-    #
-    # imageName = 'human_' + str(i) + '_'
-    # colorName = loader.GetImageName(imageName + 'c', fileType)
-    # depthName = loader.GetImageName(imageName + 'depth_vi', fileType)
-    #
-    # loader.resize_canvas(colorPath[i], resizeFolder +"/Raw/" + colorName, img_type=fileType, canvas_width=128, canvas_height=128)
-    # loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthName, img_type=fileType, canvas_width=128, canvas_height=128)
+
+# for i in range(len(rawPath)):
+#
+#     imageName = 'street_' + str(i) + '_'
+#     colorFullPath = colorPath + loader.GetImageName(imageName + 'c', fileType)
+#     depthFullPath = depthPath + loader.GetImageName(imageName + 'depth_vi', fileType)
+#
+#     loader.SplitDepthPairImage(image_path=rawPath[i], color_area=colorArea, depth_area=depthArea,
+#                                 output_color_path=colorFullPath, output_depth_path=depthFullPath, output_size=outputSize, img_type=fileType)
+#     # colorNewFileName = loader.ChangeImageFileType(colorPath[i], fileType)
+#     # depthNewFileName = loader.ChangeImageFileType(depthPath[i], fileType)
+#     #
+#     # imageName = 'human_' + str(i) + '_'
+#     # colorName = loader.GetImageName(imageName + 'c', fileType)
+#     # depthName = loader.GetImageName(imageName + 'depth_vi', fileType)
+#     #
+#     # loader.resize_canvas(colorPath[i], resizeFolder +"/Raw/" + colorName, img_type=fileType, canvas_width=128, canvas_height=128)
+#     # loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthName, img_type=fileType, canvas_width=128, canvas_height=128)
