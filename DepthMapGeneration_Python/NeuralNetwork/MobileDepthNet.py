@@ -24,7 +24,7 @@ from albumentations import (
     Compose, HorizontalFlip, Blur, RandomGamma,RandomBrightnessContrast
 )
 dataLoader = LoaderUtility()
-EPOCHS = 200
+EPOCHS = 100
 BATCHSIZE = 16
 trainXPath = '../Dataset/ResizeImage/Train/Raw/'
 trainYPath = '../Dataset/ResizeImage/Train/Depth/'
@@ -63,7 +63,7 @@ validDataLoader = ImageDataLoader(validData, validXPath, validYPath, batch_size=
 mobileDepthNet = PretrainedModel()
 model = mobileDepthNet.Build((targetSize[0], targetSize[1], 3), data_format='channels_last')
 #
-checkpoint_path = "../save_model/training_1/cp.ckpt"
+checkpoint_path = "../save_checkpoint/mobile_decoder/cp.ckpt"
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
 # Create a callback that saves the model's weights
@@ -75,24 +75,24 @@ if os.path.exists(checkpoint_path + '.index'):
 #
 # model.save("../save_model/", save_format="tf")
 
-model_history = model.fit(x=trainDataLoader, epochs=EPOCHS, callbacks=[cp_callback], validation_data=validDataLoader, workers=4)
+# model_history = model.fit(x=trainDataLoader, epochs=EPOCHS, callbacks=[cp_callback], validation_data=validDataLoader, workers=4)
 
-# testX, testY = validDataLoader.__getitem__(0)
+testX, testY = validDataLoader.__getitem__(0)
 # testX, testY = trainDataLoader.__getitem__(0)
 
-# predictSet = testX[0].reshape(1, targetSize[0], targetSize[1], 3)
-# result = model.predict(predictSet)
-#
-# input = testX[0].reshape(targetSize[0], targetSize[1], 3)
-# result = result.reshape(targetSize[0], targetSize[1], 1)
-# groundTruth = testY[0].reshape(targetSize[0], targetSize[1],1)
-#
-# print(result)
-# print(groundTruth)
-#
-# cv2.imshow('image',result)
-# cv2.imshow('input',input)
-# cv2.imshow('groundTruth', groundTruth)
-#
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+predictSet = testX[0].reshape(1, targetSize[0], targetSize[1], 3)
+result = model.predict(predictSet)
+
+input = testX[0].reshape(targetSize[0], targetSize[1], 3)
+result = result.reshape(targetSize[0], targetSize[1], 1)
+groundTruth = testY[0].reshape(targetSize[0], targetSize[1],1)
+
+print(result)
+print(groundTruth)
+
+cv2.imshow('image',result)
+cv2.imshow('input',input)
+cv2.imshow('groundTruth', groundTruth)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()

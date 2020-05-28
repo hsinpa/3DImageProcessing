@@ -9,9 +9,8 @@
 node_modules/
 
 /DepthMapGeneration_Python/.idea/
-/DepthMapGeneration_Python/Dataset/indoor_test/
-/DepthMapGeneration_Python/Dataset/indoor_train/
-/DepthMapGeneration_Python/Dataset/ResizeImage/
+/DepthMapGeneration_Python/Dataset/
+
 
 /DepthMapGeneration_Python/save_model/
 *__pycache__

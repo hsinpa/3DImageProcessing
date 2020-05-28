@@ -167,8 +167,11 @@ class LoaderUtility:
 
         newImage.save(new_image_path, img_type)
 
+    def ConvertImageType(self, image_path, file_name):
+        img = cv2.imread(image_path)
+        cv2.imwrite(file_name, img)
+
     def SplitDepthPairImage(self, image_path, color_area, depth_area, output_size, output_color_path, output_depth_path, img_type):
-        print(image_path)
         im = Image.open(image_path).convert("RGB")
         width, height = im.size
         # box_width, box_height = box_size

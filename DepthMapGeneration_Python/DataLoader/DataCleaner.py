@@ -3,8 +3,9 @@ from DataLoader.LoaderUtility import LoaderUtility
 from typing import List
 import os, os.path
 
-valid_images = [".jpg",".png", ".tif", '.tiff']
+valid_images = [".jpg",".png", ".tif", '.tiff', '.jpeg']
 labels = []
+
 
 
 def GetImageFromPath(p_path: str, p_valid_formats: List[str]):
@@ -20,11 +21,12 @@ def GetImageFromPath(p_path: str, p_valid_formats: List[str]):
     return path
 
 # resizeFolder = "../Dataset/ResizeImage/Train"
-resizeFolder = "../Dataset/BlenderTest"
+resizeFolder = "../Dataset/WantData"
 
 indoorTestPath = '../Dataset/indoor_test/test/LR/'
 indoorTrainPath = '../Dataset/indoor_train/train/LR/'
-directPath = '../Dataset/RawHandMade'
+
+directPath = '../Dataset/WantData'
 
 loader = LoaderUtility()
 
@@ -45,16 +47,26 @@ allFolders = {indoorTestPath: indoorTestFolders, indoorTrainPath: indoorTrainFol
 #             loader.resize_canvas(colorPath[i], resizeFolder +"/Raw/" + colorNewFileName, img_type="jpeg", canvas_width=128, canvas_height=128)
 #             loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthNewFileName, img_type="jpeg", canvas_width=128, canvas_height=128)
 
-colorPath = GetImageFromPath(directPath + "/color/", valid_images)
-depthPath = GetImageFromPath(directPath + "/depth_vi/", valid_images)
+#
+colorPath = GetImageFromPath(directPath + "/scene3_color/", valid_images)
+depthPath = GetImageFromPath(directPath + "/scene3_depth/", valid_images)
+
 for i in range(len(colorPath)):
     fileType = 'jpeg'
-    colorNewFileName = loader.ChangeImageFileType(colorPath[i], fileType)
-    depthNewFileName = loader.ChangeImageFileType(depthPath[i], fileType)
 
-    imageName = 'human_' + str(i) + '_'
+    imageName = 'human_scene3_' + str(i) + '_'
     colorName = loader.GetImageName(imageName + 'c', fileType)
     depthName = loader.GetImageName(imageName + 'depth_vi', fileType)
 
     loader.resize_canvas(colorPath[i], resizeFolder +"/Raw/" + colorName, img_type=fileType, canvas_width=128, canvas_height=128)
     loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthName, img_type=fileType, canvas_width=128, canvas_height=128)
+
+#
+# depthPath = GetImageFromPath(directPath + "/Test/", valid_images)
+# for i in range(len(depthPath)):
+#     fileType = 'jpeg'
+#
+#     depthNewFileName = directPath + "/Test/"+loader.ChangeImageFileType(depthPath[i], fileType)
+#     print(depthNewFileName)
+#
+#     loader.ConvertImageType(image_path=depthPath[i], file_name=depthNewFileName)
