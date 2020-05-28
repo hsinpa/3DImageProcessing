@@ -34,23 +34,23 @@ def ChangeColorDepthToGray(p_path):
 
             scale = 0.9
             Gray = ((-1 * nBlue) + (1 * nRed)) * (1 - GE)
-            Gray = (Gray + 1) * 0.5 * scale
+            Gray = ((Gray + 1) * 0.5) * scale
 
-            if ((Red < 3 and Green < 3 and Blue > 127 ) or (Blue < 3 and Green < 3 and Red > 127)):
+            if ((Green < 5 and Blue > 117 ) or (Green < 5 and Red > 117)):
                 max = 255.0
+                min = 117
 
                 if (nRed > nBlue):
-                    residual = (1 - (Red / max)) * 0.1
+                    residual = (1 - ((Red - min) / (max - min))) * 0.1
                     Gray = scale + residual
                 else:
-                    residual = (1 - (Blue / max)) * 0.1
+                    residual = (1 - ((Blue - min) / (max - min))) * 0.1
                     Gray = (1-scale) - residual
 
-            Gray = 255 - int(Gray * 255)
+            Gray = 255 - int(round(Gray * 255))
             pixelsNew[x, y] = (Gray, Gray, Gray)
 
     im.close()
-    img.show()
     img.save(p_path)
     img.close()
 
@@ -94,12 +94,10 @@ d_y = 0
 d_width = 512
 d_height = 256
 depthArea = (d_x, d_y, d_width, d_height)
-
+#
 for i in range(len(allDepthImage)):
     ChangeColorDepthToGray(allDepthImage[i])
-
-
-
+#
 # for i in range(len(rawPath)):
 #
 #     imageName = 'street_' + str(i) + '_'
@@ -108,12 +106,3 @@ for i in range(len(allDepthImage)):
 #
 #     loader.SplitDepthPairImage(image_path=rawPath[i], color_area=colorArea, depth_area=depthArea,
 #                                 output_color_path=colorFullPath, output_depth_path=depthFullPath, output_size=outputSize, img_type=fileType)
-#     # colorNewFileName = loader.ChangeImageFileType(colorPath[i], fileType)
-#     # depthNewFileName = loader.ChangeImageFileType(depthPath[i], fileType)
-#     #
-#     # imageName = 'human_' + str(i) + '_'
-#     # colorName = loader.GetImageName(imageName + 'c', fileType)
-#     # depthName = loader.GetImageName(imageName + 'depth_vi', fileType)
-#     #
-#     # loader.resize_canvas(colorPath[i], resizeFolder +"/Raw/" + colorName, img_type=fileType, canvas_width=128, canvas_height=128)
-#     # loader.resize_canvas(depthPath[i], resizeFolder +"/Depth/" + depthName, img_type=fileType, canvas_width=128, canvas_height=128)
